@@ -1,45 +1,17 @@
-//Add Leap Controller
-controllerOptions = {};
-
-//kNN Classifier
-const knnClassifier = ml5.KNNClassifier();
-
-//Set bool to false by default
-var trainingCompleted = false;
-
-//Prediction Average Equation Vars
-var predictionAccuracyAverage = 0;
-var numPredictions = 0;
-var currentPrediction;
-var digitToTest = 2;
-
-var row = 0;
-var col = 0;
-
-//var numFeatures = testArray.shape[2];
-//var oneFrameOfData = nj.zeros([5,4,6]);
-
-var framesOfData = nj.zeros([5,4,6]);
-var currentTestingSample = nj.zeros([5,4,6]);
+/*
+var numFeatures = testArray.shape[2];
+var oneFrameOfData = nj.zeros([5,4,6]);
 
 //Num Samples = Coordinate sets in testArray
 var numSamples = 20;
 
-//More vars;
-/*var currentFeatures;
-var currentLabel;*/
+var currentFeatures;
+var currentLabel;
 //var testingSampleIndex = 0;
 var predictedClassLabels = nj.zeros([numSamples]);
 var predictedLabel;
 
-//Force printing of long arrays
-nj.config.printThreshold = 1000;
-
-// More vars.
-var programState = 0;
 var userID = 1;
-
-var digitToShow = 0;
 var timeSinceLastDigitChange = new Date();
 
 //D10
@@ -53,7 +25,35 @@ var averageArrayIndex = 0;
 var signTimeLimitDefault = 6;
 var signTimeLimit = signTimeLimitDefault;
 
-var difficulty = 0;
+var difficulty = 0;*/
+
+//Add Leap Controller
+controllerOptions = {};
+
+//kNN Classifier
+const knnClassifier = ml5.KNNClassifier();
+
+//Set bool to false by default
+var trainingCompleted = false;
+
+//Prediction Average Equation Vars
+var predictionAccuracyAverage = 0;
+var numPredictions = 0;
+var currentPrediction;
+
+var row = 0;
+var col = 0;
+
+var framesOfData = nj.zeros([5,4,6]);
+var currentTestingSample = nj.zeros([5,4,6]);
+
+//Force printing of long arrays
+nj.config.printThreshold = 1000;
+
+// More vars.
+var programState = 0;
+var itemToPredict = 0;
+var element = -1;
 
 //Center Data
 function centerData(features) {
@@ -198,168 +198,46 @@ function train() {
 
 	for (var i = 0; i < 2; i++) {
 
-
-
-		//0
-		features = train0Wills.pick(null,null,null,i);
+		//0 = Air
+		features = air1.pick(null,null,null,i);
 		features = centerData(features);
 		knnClassifier.addExample(features.tolist(), 0);
-		features = train0Wills.pick(null,null,null,i);
-		features = centerMirrorData(features);
+		/*features = air2.pick(null,null,null,i);
+		features = centerData(features);
 		knnClassifier.addExample(features.tolist(), 0);
+		features = air3.pick(null,null,null,i);
+		features = centerData(features);
+		knnClassifier.addExample(features.tolist(), 0);
+		features = air4.pick(null,null,null,i);
+		features = centerData(features);
+		knnClassifier.addExample(features.tolist(), 0);
+		features = air5.pick(null,null,null,i);
+		features = centerData(features);
+		knnClassifier.addExample(features.tolist(), 0);
+		features = air6.pick(null,null,null,i);
+		features = centerData(features);
+		knnClassifier.addExample(features.tolist(), 0);*/
 
-
-
-		//1:
-		features = train1.pick(null,null,null,i);
+		//1 = Fire
+		features = fire1.pick(null,null,null,i);
 		features = centerData(features);
 		knnClassifier.addExample(features.tolist(), 1);
-		features = train1.pick(null,null,null,i);
-		features = centerMirrorData(features);
+		features = fire2.pick(null,null,null,i);
+		features = centerData(features);
+		knnClassifier.addExample(features.tolist(), 1);
+		features = fire3.pick(null,null,null,i);
+		features = centerData(features);
+		knnClassifier.addExample(features.tolist(), 1);
+		features = fire4.pick(null,null,null,i);
+		features = centerData(features);
+		knnClassifier.addExample(features.tolist(), 1);
+		features = fire5.pick(null,null,null,i);
+		features = centerData(features);
+		knnClassifier.addExample(features.tolist(), 1);
+		features = fire6.pick(null,null,null,i);
+		features = centerData(features);
 		knnClassifier.addExample(features.tolist(), 1);
 
-
-
-		//2:
-		features = train2.pick(null,null,null,i);
-		features = centerData(features);
-		knnClassifier.addExample(features.tolist(), 2);
-		features = train2.pick(null,null,null,i);
-		features = centerMirrorData(features);
-		knnClassifier.addExample(features.tolist(), 2);
-
-		features = train2Liu.pick(null,null,null,i);
-		features = centerData(features);
-		knnClassifier.addExample(features.tolist(), 2);
-		features = train2Liu.pick(null,null,null,i);
-		features = centerMirrorData(features);
-		knnClassifier.addExample(features.tolist(), 2);
-
-
-
-		//3
-		features = train3Shi.pick(null,null,null,i);
-		features = centerData(features);
-		knnClassifier.addExample(features.tolist(), 3);
-		features = train3Shi.pick(null,null,null,i);
-		features = centerMirrorData(features);
-		knnClassifier.addExample(features.tolist(), 3);
-
-		features = train3Jing.pick(null,null,null,i);
-		features = centerData(features);
-		knnClassifier.addExample(features.tolist(), 3);
-		features = train3Jing.pick(null,null,null,i);
-		features = centerMirrorData(features);
-		knnClassifier.addExample(features.tolist(), 3);
-
-
-
-		//4
-
-		features = train4Makovsky.pick(null,null,null,i);
-		features = centerData(features);
-		knnClassifier.addExample(features.tolist(), 4);
-		features = train4Makovsky.pick(null,null,null,i);
-		features = centerMirrorData(features);
-		knnClassifier.addExample(features.tolist(), 4);
-
-		features = train4Bongard.pick(null,null,null,i);
-		features = centerData(features);
-		knnClassifier.addExample(features.tolist(), 4);
-		features = train4Bongard.pick(null,null,null,i);
-		features = centerMirrorData(features);
-		knnClassifier.addExample(features.tolist(), 4);
-
-
-
-		//5:
-		features = train5.pick(null,null,null,i);
-		features = centerData(features);
-		knnClassifier.addExample(features.tolist(), 5);
-		features = train5.pick(null,null,null,i);
-		features = centerMirrorData(features);
-		knnClassifier.addExample(features.tolist(), 5);
-
-		features = train5Fekert.pick(null,null,null,i);
-		features = centerData(features);
-		knnClassifier.addExample(features.tolist(), 5);
-		features = train5Fekert.pick(null,null,null,i);
-		features = centerMirrorData(features);
-		knnClassifier.addExample(features.tolist(), 5);
-
-
-
-		//6:
-		features = train6.pick(null,null,null,i);
-		features = centerData(features);
-		knnClassifier.addExample(features.tolist(), 6);
-		features = train6.pick(null,null,null,i);
-		features = centerMirrorData(features);
-		knnClassifier.addExample(features.tolist(), 6);
-
-		features = train6Bongard.pick(null,null,null,i);
-		features = centerData(features);
-		knnClassifier.addExample(features.tolist(), 6);
-		features = train6Bongard.pick(null,null,null,i);
-		features = centerMirrorData(features);
-		knnClassifier.addExample(features.tolist(), 6);
-
-		features = train6NEW.pick(null,null,null,i);
-		features = centerData(features);
-		knnClassifier.addExample(features.tolist(), 6);
-		features = train6NEW.pick(null,null,null,i);
-		features = centerMirrorData(features);
-		knnClassifier.addExample(features.tolist(), 6);
-
-
-
-		//7:
-		features = train7.pick(null,null,null,i);
-		features = centerData(features);
-		knnClassifier.addExample(features.tolist(), 7);
-		features = train7.pick(null,null,null,i);
-		features = centerMirrorData(features);
-		knnClassifier.addExample(features.tolist(), 7);
-
-		features = train7NEW.pick(null,null,null,i);
-		features = centerData(features);
-		knnClassifier.addExample(features.tolist(), 7);
-		features = train7NEW.pick(null,null,null,i);
-		features = centerMirrorData(features);
-		knnClassifier.addExample(features.tolist(), 7);
-
-
-
-		//8:
-		features = train8.pick(null,null,null,i);
-		features = centerMirrorData(features);
-		knnClassifier.addExample(features.tolist(), 8);
-		features = train8.pick(null,null,null,i);
-		features = centerMirrorData(features);
-		knnClassifier.addExample(features.tolist(), 8);
-
-		features = train8Bongard.pick(null,null,null,i);
-		features = centerMirrorData(features);
-		knnClassifier.addExample(features.tolist(), 8);
-		features = train8Bongard.pick(null,null,null,i);
-		features = centerMirrorData(features);
-		knnClassifier.addExample(features.tolist(), 8);
-
-		features = train8NEW.pick(null,null,null,i);
-		features = centerMirrorData(features);
-		knnClassifier.addExample(features.tolist(), 8);
-		features = train8NEW.pick(null,null,null,i);
-		features = centerMirrorData(features);
-		knnClassifier.addExample(features.tolist(), 8);
-
-
-		//9:
-		features = train9.pick(null,null,null,i);
-		features = centerData(features);
-		knnClassifier.addExample(features.tolist(), 9);
-		features = train9.pick(null,null,null,i);
-		features = centerMirrorData(features);
-		knnClassifier.addExample(features.tolist(), 9);
 	}
 
 	trainingCompleted = true;
@@ -391,7 +269,7 @@ function test() {
 		++numPredictions;
 
 		/* m = (n − 1)m + (c == d) / n */
-		predictionAccuracyAverage = (((numPredictions - 1)*predictionAccuracyAverage) + (currentPrediction === digitToShow)) / numPredictions;
+		predictionAccuracyAverage = (((numPredictions - 1)*predictionAccuracyAverage) + (currentPrediction === itemToPredict)) / numPredictions;
 
 		//Log accuracy
 		// console.log(numPredictions, predictionAccuracyAverage, currentPrediction);
@@ -408,10 +286,12 @@ function GotResults(err, result) {
 	//console.log("PREDICTED LABEL: ", parseInt(result.label)); //"INDEX: ",testingSampleIndex,
 	currentPrediction = parseInt(result.label);
 
-
+	if (parseInt(result.label) == 0) {
+		element = 0;
+	}
 
 	//print label:
-	// console.log("PREDICTION: ", currentPrediction);
+	console.log("PREDICTION: ", currentPrediction);
 
 	//Return it
 	return(parseInt(result.label));
@@ -423,13 +303,15 @@ function HandleFrame(frame) {
 	//Num hands
 	var handCount = frame.hands.length;
 
-	//data on first hand
-	var hand = frame.hands[0];
+	//data on hands
+	var hand1 = frame.hands[0];
+	var hand2 = frame.hands[1];
 
 	//Interaction Box
 	var interactionBox = frame.interactionBox;
 
-	HandleHand(hand, handCount, interactionBox);
+	HandleHand(hand1, handCount, interactionBox);
+	HandleHand(hand2, handCount, interactionBox);
 }
 
 //Handle Hand
@@ -495,10 +377,10 @@ function HandleBone(bone, handCount, fingerIndex, interactionBox) {
 
 		//**MAKE SURE TRANSFORM HAPPENS AFTER DATA IS RECORDED**
 		//Scale new points to canvas
-		var canvasX1 = window.innerWidth/2 * x1;
-		var canvasY1 = window.innerHeight/2 * (1 - y1);
-		var canvasX2 = window.innerWidth/2 * x2;
-		var canvasY2 = window.innerHeight/2 * (1 - y2);
+		var canvasX1 = window.innerWidth * x1;
+		var canvasY1 = window.innerHeight * (1 - y1);
+		var canvasX2 = window.innerWidth * x2;
+		var canvasY2 = window.innerHeight * (1 - y2);
 
 		//Z min and max
 		var rawZmax = 200;
@@ -511,7 +393,7 @@ function HandleBone(bone, handCount, fingerIndex, interactionBox) {
 		//Bone segment number
 		var boneType = bone.type;
 
-		var red = (1 - predictionAccuracyAverage) * 255;
+		/*var red = (1 - predictionAccuracyAverage) * 255;
 		var blue = predictionAccuracyAverage * 255;
 		// console.log("RED: ", red, " GREEN: ", green);
 
@@ -524,11 +406,44 @@ function HandleBone(bone, handCount, fingerIndex, interactionBox) {
 			stroke(red, blue,  50);
 		} else if (boneType === 3) {
 			stroke(red, blue,  25);
+		}*/
+
+		//GREEN IF 1 HAND
+		if (handCount === 1) {
+
+			if (boneType === 0) {
+				stroke('rgb(179, 255, 224)');
+			} else if (boneType === 1) {
+				stroke('rgb(77, 255, 184)');
+			} else if (boneType === 2) {
+				stroke('rgb(0, 230, 138)');
+			} else if (boneType === 3) {
+				stroke('rgb(0, 153, 92)');
+			}
+
+			//RED IF 2 HANDS
+		} else if (handCount === 2) {
+
+			if (boneType === 0) {
+				stroke('rgb(255, 214, 204)');
+			} else if (boneType === 1) {
+				stroke('rgb(255, 133, 102)');
+			} else if (boneType === 2) {
+				stroke('rgb(255, 71, 26)');
+			} else if (boneType === 3) {
+				stroke('rgb(179, 36, 0)');
+			}
+
 		}
 
 		strokeWeight(zStrokeWeight/5);
 
 		line(canvasX1,canvasY1,canvasX2,canvasY2);
+
+		//Handle Element
+		if (element === 0) {
+
+		}
 	}
 	catch(err) {
 		//console.log("Drawing line failed");
@@ -536,7 +451,7 @@ function HandleBone(bone, handCount, fingerIndex, interactionBox) {
 
 }
 
-function HandIsTooFarToTheLeft() {
+/*function HandIsTooFarToTheLeft() {
 
 	// console.log(framesOfData.toString());
 	var xValues = framesOfData.slice([],[],[0,6,3]);
@@ -609,25 +524,29 @@ function HandIsTooFarForward() {
 	//console.log("Z: ", currentMean);
 
 	return currentMean < 0.25;
+}*/
+
+/*function drawArrow(arrow) {
+	image(arrow, window.innerWidth * .75, 0, window.innerWidth, window.innerHeight * .25);
 }
 
 function drawArrowRight() {
-	image(arrowRight, window.innerWidth/2, 0, window.innerWidth/2, window.innerHeight/2);
+	drawArrow(arrowRight);
 }
 function drawArrowLeft() {
-	image(arrowLeft, window.innerWidth/2, 0, window.innerWidth/2, window.innerHeight/2);
+	drawArrow(arrowLeft);
 }
 function drawArrowUp() {
-	image(arrowUp, window.innerWidth/2, 0, window.innerWidth/2, window.innerHeight/2);
+	drawArrow(arrowUp);
 }
 function drawArrowDown() {
-	image(arrowDown, window.innerWidth/2, 0, window.innerWidth/2, window.innerHeight/2);
+	drawArrow(arrowDown);
 }
 function drawArrowAway() {
-	image(arrowAway, window.innerWidth/2, 0, window.innerWidth/2, window.innerHeight/2);
+	drawArrow(arrowAway);
 }
 function drawArrowTorward() {
-	image(arrowToward, window.innerWidth/2, 0, window.innerWidth/2, window.innerHeight/2);
+	drawArrow(arrowToward);
 }
 
 function HandIsUncentered() {
@@ -662,34 +581,7 @@ function HandIsUncentered() {
 
 	//If pass all, return false
 	return false;
-}
-
-//Determine State
-function DetermineState(frame) {
-
-	//Num hands
-	var handCount = frame.hands.length;
-
-	//If no hands
-	if (handCount === 0) {
-		programState = 0;
-	}
-
-	//If 1+ hands
-	else {
-		//If hand is uncentered
-		if (HandIsUncentered()) {
-			programState = 1;
-		}
-
-		//If hand is centered
-		else {
-			programState = 2;
-		}
-	}
-
-}
-
+}*/
 
 function TrainKNNIfNotDoneYet() {
 	if (trainingCompleted === false) {
@@ -707,105 +599,85 @@ function TrainKNNIfNotDoneYet() {
 	scoresInitialized = true;
 }*/
 
-function DrawImageToHelpUserPutTheirHandOverTheDevice() {
+/*function DrawImageToHelpUserPutTheirHandOverTheDevice() {
 	image(img,0,0,window.innerWidth/2,window.innerHeight/2);
 }
 
-//No Hands
-function HandleState0(frame) {
-	TrainKNNIfNotDoneYet();
-	// InitializeScorePerDigit();
-	DrawImageToHelpUserPutTheirHandOverTheDevice();
-}
 
-//Hand Uncentered
-function HandleState1(frame) {
-	//Draw hands
-	HandleFrame(frame);
-}
-
-//Hand Centered
-function HandleState2(frame) {
-	//Draw hands
-	HandleFrame(frame);
-	test();
-	DrawLowerRightPanel();
-	DetermineWhetherToSwitchDigits();
-}
 
 function DrawLowerRightPanel() {
 
 	//Level zero  = Easy
 	if (difficulty < 1) {
-		if (digitToShow == 0) {
+		if (itemToPredict == 0) {
 			image(signZero, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 1) {
+		} else if (itemToPredict == 1) {
 			image(signOne, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 2) {
+		} else if (itemToPredict == 2) {
 			image(signTwo, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 3) {
+		} else if (itemToPredict == 3) {
 			image(signThree, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 4) {
+		} else if (itemToPredict == 4) {
 			image(signFour, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 5) {
+		} else if (itemToPredict == 5) {
 			image(signFive, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 6) {
+		} else if (itemToPredict == 6) {
 			image(signSix, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 7) {
+		} else if (itemToPredict == 7) {
 			image(signSeven, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 8) {
+		} else if (itemToPredict == 8) {
 			image(signEight, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 9) {
+		} else if (itemToPredict == 9) {
 			image(signNine, window.innerWidth / 2, window.innerHeight / 2, window.innerWidth, window.innerHeight);
 		}
 	}
 
 	//Level one = medium
 	else if (difficulty == 1) {
-		if (digitToShow == 0) {
+		if (itemToPredict == 0) {
 			image(altSignZero, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 1) {
+		} else if (itemToPredict == 1) {
 			image(altSignOne, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 2) {
+		} else if (itemToPredict == 2) {
 			image(altSignTwo, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 3) {
+		} else if (itemToPredict == 3) {
 			image(altSignThree, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 4) {
+		} else if (itemToPredict == 4) {
 			image(altSignFour, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 5) {
+		} else if (itemToPredict == 5) {
 			image(altSignFive, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 6) {
+		} else if (itemToPredict == 6) {
 			image(altSignSix, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 7) {
+		} else if (itemToPredict == 7) {
 			image(altSignSeven, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 8) {
+		} else if (itemToPredict == 8) {
 			image(altSignEight, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 9) {
+		} else if (itemToPredict == 9) {
 			image(altSignNine, window.innerWidth / 2, window.innerHeight / 2, window.innerWidth, window.innerHeight);
 		}
 	}
 
 	//Level two = hot dogs
 	else {
-		if (digitToShow == 0) {
+		if (itemToPredict == 0) {
 			image(altSignZeroHOTDOG, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 1) {
+		} else if (itemToPredict == 1) {
 			image(altSignOneHOTDOG, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 2) {
+		} else if (itemToPredict == 2) {
 			image(altSignTwoHOTDOG, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 3) {
+		} else if (itemToPredict == 3) {
 			image(altSignThreeHOTDOG, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 4) {
+		} else if (itemToPredict == 4) {
 			image(altSignFourHOTDOG, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 5) {
+		} else if (itemToPredict == 5) {
 			image(altSignFiveHOTDOG, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 6) {
+		} else if (itemToPredict == 6) {
 			image(altSignSixHOTDOG, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 7) {
+		} else if (itemToPredict == 7) {
 			image(altSignSevenHOTDOG, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 8) {
+		} else if (itemToPredict == 8) {
 			image(altSignEightHOTDOG, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerHeight);
-		} else if (digitToShow == 9) {
+		} else if (itemToPredict == 9) {
 			image(altSignNineHOTDOG, window.innerWidth / 2, window.innerHeight / 2, window.innerWidth, window.innerHeight);
 		}
 	}
@@ -830,9 +702,9 @@ function analyzeUserResults() {
 		//Find minimum (worst score) in array
 		if (scorePerDigit.get(i) == scorePerDigit.min()) {
 			//Set the respective digit as the next digit to show
-			digitToShow = i;
+			itemToPredict = i;
 			//console.log("MIN: ", scorePerDigit.min());
-			//console.log("Next Worst Digit: ", digitToShow);
+			//console.log("Next Worst Digit: ", itemToPredict);
 		}
 	}
 
@@ -850,21 +722,21 @@ function SwitchDigits() {
 	score = predictionAccuracyAverage * 100;
 
 	//Print iiiitt
-	console.log("DIGIT: ", digitToShow,"| SCORE: ", score);
+	console.log("DIGIT: ", itemToPredict,"| SCORE: ", score);
 
 	//Add to respective score
-	scorePerDigit.set(digitToShow, score);
+	scorePerDigit.set(itemToPredict, score);
 	console.log(scorePerDigit.toString());
 
 	//ORDER IS: 0->1->...->9
 	if (signedAllTen === false) {
 
 		//Iterate digit
-		digitToShow += 1;
-		//console.log("Signing: ", digitToShow);
+		itemToPredict += 1;
+		//console.log("Signing: ", itemToPredict);
 
 		//All ten have been signed, begin showing ones with the worst scores
-		if (digitToShow > 9) {
+		if (itemToPredict > 9) {
 
 			//End bool
 			signedAllTen = true;
@@ -1002,8 +874,53 @@ function SignIn() {
 	// console.log("Users: ", users);
 
 	return false;
+}*/
+
+//No Hands
+function HandleState0(frame) {
+	TrainKNNIfNotDoneYet();
+	// InitializeScorePerDigit();
+	// DrawImageToHelpUserPutTheirHandOverTheDevice();
 }
 
+//Determine State
+function DetermineState(frame) {
+
+	//Num hands
+	var handCount = frame.hands.length;
+
+	//If no hands
+	if (handCount === 0) {
+		programState = 0;
+	}
+
+	//If 1 hand
+	else if (handCount === 1) {
+		programState = 1;
+	}
+
+	//If 2 hands
+	else {
+		programState = 2;
+	}
+
+}
+
+//Hand Uncentered
+function HandleState1(frame) {
+	//Draw hands
+	HandleFrame(frame);
+	test();
+}
+
+//Hand Centered
+function HandleState2(frame) {
+	//Draw hands
+	HandleFrame(frame);
+	test();
+	/*DrawLowerRightPanel();
+	DetermineWhetherToSwitchDigits();*/
+}
 
 //LEAP TIME
 Leap.loop(controllerOptions, function(frame) {
@@ -1011,9 +928,9 @@ Leap.loop(controllerOptions, function(frame) {
 	try {
 		clear();
 
-		DetermineState(frame);
+		HandleFrame(frame);
 
-		// console.log(programState);
+		DetermineState(frame);
 
 		if (programState === 0) {
 			HandleState0(frame);
