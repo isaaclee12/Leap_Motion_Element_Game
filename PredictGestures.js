@@ -24,11 +24,34 @@ nj.config.printThreshold = 1000;
 // More vars.
 var programState = 0;
 var itemToPredict = 0;
-var element = -1;
+var userElement = -1;
 
 //Time
 var timeSinceLastChange = new Date();
 var timeLimit = 5;
+
+//Elements/Enemies
+var elements = ["Air", "Water", "Earth", "Fire", "Lightning", "Wood"];
+
+var userElementTextX = window.innerWidth/10;
+var userElementTextY = window.innerHeight/10;
+
+var enemyAlive = false;
+var enemyID = -1;
+var enemyElement = "";
+
+var enemyElementTextX = window.innerWidth * .90;
+var enemyElementTextY = window.innerHeight/10;
+
+//Win counter
+var wins = -1;
+
+// Num hands
+var handCount = 0;
+
+// data on hands
+var hand1, hand2;
+
 
 // Center Data
 function centerData(features) {
@@ -180,6 +203,7 @@ function train() {
 		features = air1.pick(null,null,null,i);
 		features = centerMirrorData(features);
 		knnClassifier.addExample(features.tolist(), 0);
+
 		/*features = air2.pick(null,null,null,i);
 		features = centerData(features);
 		knnClassifier.addExample(features.tolist(), 0);
@@ -195,6 +219,8 @@ function train() {
 		features = air6.pick(null,null,null,i);
 		features = centerData(features);
 		knnClassifier.addExample(features.tolist(), 0);*/
+
+
 
 		// 1 = Fire
 		features = fire1.pick(null,null,null,i);
@@ -238,6 +264,51 @@ function train() {
 		features = fire6.pick(null,null,null,i);
 		features = centerMirrorData(features);
 		knnClassifier.addExample(features.tolist(), 1);
+
+
+
+		// 2 = water
+		features = water1.pick(null,null,null,i);
+		features = centerData(features);
+		knnClassifier.addExample(features.tolist(), 2);
+		features = water1.pick(null,null,null,i);
+		features = centerMirrorData(features);
+		knnClassifier.addExample(features.tolist(), 2);
+
+		features = water2.pick(null,null,null,i);
+		features = centerData(features);
+		knnClassifier.addExample(features.tolist(), 2);
+		features = water2.pick(null,null,null,i);
+		features = centerMirrorData(features);
+		knnClassifier.addExample(features.tolist(), 2);
+
+		features = water3.pick(null,null,null,i);
+		features = centerData(features);
+		knnClassifier.addExample(features.tolist(), 2);
+		features = water3.pick(null,null,null,i);
+		features = centerMirrorData(features);
+		knnClassifier.addExample(features.tolist(), 2);
+
+		features = water4.pick(null,null,null,i);
+		features = centerData(features);
+		knnClassifier.addExample(features.tolist(), 2);
+		features = water4.pick(null,null,null,i);
+		features = centerMirrorData(features);
+		knnClassifier.addExample(features.tolist(), 2);
+
+		features = water5.pick(null,null,null,i);
+		features = centerData(features);
+		knnClassifier.addExample(features.tolist(), 2);
+		features = water5.pick(null,null,null,i);
+		features = centerMirrorData(features);
+		knnClassifier.addExample(features.tolist(), 2);
+
+		features = water6.pick(null,null,null,i);
+		features = centerData(features);
+		knnClassifier.addExample(features.tolist(), 2);
+		features = water6.pick(null,null,null,i);
+		features = centerMirrorData(features);
+		knnClassifier.addExample(features.tolist(), 2);
 
 	}
 
@@ -287,12 +358,33 @@ function GotResults(err, result) {
 	// console.log("PREDICTED LABEL: ", parseInt(result.label)); // "INDEX: ",testingSampleIndex,
 	currentPrediction = parseInt(result.label);
 
-	if (parseInt(result.label) == 0) {
-		element = 0;
+
+	// 1 Hand:
+	if (handCount === 1) {
+
+		//AIR = Single Palm
+		if (parseInt(result.label) === 0) {
+			userElement = "AIR";
+		}
+
+		//FIRE = Single Fist
+		else if (parseInt(result.label) === 1) {
+			userElement = "FIRE";
+		}
 	}
 
-	else if (parseInt(result.label) == 1) {
-		element = 1;
+	// 2 Hands:
+	else if (handCount === 2) {
+
+		//WATER = Two Palms
+		if (parseInt(result.label) === 0) {
+			userElement = "WATER";
+		}
+
+		//EARTH = Two Fists
+		else if (parseInt(result.label) === 1) {
+			userElement = "EARTH";
+		}
 	}
 
 	// print label:
@@ -302,15 +394,237 @@ function GotResults(err, result) {
 	return(parseInt(result.label));
 }
 
+//Handle Element
+function HandleElement(bone, handCount, fingerIndex, boneType, canvasX1, canvasY1) {
+	try {
+		//Set Vars
+		textSize(32);
+		var diameter = 30;
+
+		if (userElement === "AIR") {
+
+			//If bone is tip of middle finger
+			if (fingerIndex === 2 && boneType === 3) {
+
+				//Color = Light Grey
+				stroke('rgb(214, 214, 214)');
+				fill('rgb(214, 214, 214)');
+
+				//Draw a circle that appears to be in front of hand, hopefully
+				circle(canvasX1, canvasY1 + 200, diameter);
+
+				//Write text
+				strokeWeight(1);
+				text('Air', userElementTextX, userElementTextY);
+			}
+		}
+
+		else if (userElement === "WATER") {
+
+			//If bone is tip of middle finger
+			if (fingerIndex === 2 && boneType === 3) {
+
+				//Color = Blue
+				stroke('rgb(74, 183, 255)');
+				fill('rgb(74, 183, 255)');
+
+				//Draw a circle that appears to be in front of hand, hopefully
+				circle(canvasX1, canvasY1 + 200, diameter);
+
+				//Write text
+				strokeWeight(1);
+				text('Water', userElementTextX, userElementTextY);
+			}
+		}
+
+		else if (userElement === "EARTH") {
+
+			//If bone is 1st knuckle of middle finger
+			if (fingerIndex === 2 && boneType === 1) {
+
+				//Color = Brown
+				stroke('rgb(82, 72, 45)');
+				fill('rgb(82, 72, 45)');
+
+				//Draw a circle that appears to be in front of hand, hopefully
+				circle(canvasX1, canvasY1 - 20, diameter);
+
+				//Write text
+				strokeWeight(1);
+				text('Earth', userElementTextX, userElementTextY);
+
+				/*//SCALE LOCATION
+                // newCoordinate = ((oldCoordinate - newMin) * factorToScaleBy) / (newMax - newMin);
+                var elementX = ((canvasX1 - 0) * 1) / (window.innerWidth - 0);
+                var elementY = ((canvasY1 - 0) * 1) / (window.innerHeight - 0);
+
+                //Draw a circle that appears to be in front of hand, hopefully
+                circle(elementX, elementY, diameter);
+                // console.log("X: ", canvasX1, "Y: ", canvasY1);*/
+			}
+		}
+
+		else if (userElement === "FIRE") {
+
+			//If bone is 1st knuckle of middle finger
+			if (fingerIndex === 2 && boneType === 1) {
+
+				//Color = Red Orange
+				stroke('rgb(252, 104, 40)');
+				fill('rgb(252, 104, 40)');
+
+				//Draw a circle that appears to be in front of hand, hopefully
+				circle(canvasX1, canvasY1 - 20, diameter);
+
+				//Write text
+				strokeWeight(1);
+				text('Fire', userElementTextX, userElementTextY);
+
+				/*//SCALE LOCATION
+                // newCoordinate = ((oldCoordinate - newMin) * factorToScaleBy) / (newMax - newMin);
+                var elementX = ((canvasX1 - 0) * 1) / (window.innerWidth - 0);
+                var elementY = ((canvasY1 - 0) * 1) / (window.innerHeight - 0);
+
+                //Draw a circle that appears to be in front of hand, hopefully
+                circle(elementX, elementY, diameter);
+                // console.log("X: ", canvasX1, "Y: ", canvasY1);*/
+			}
+		}
+
+	}
+	catch(err) {
+
+	}
+
+}
+
+function ScaleElement() {
+	/*var xValues = dataFrames.slice([],[],[0,6,3]);
+
+	var currentMean = xValues.mean();
+
+	var horizontalShift = 0.5 - currentMean;
+
+	// 1st Sheet - x1
+	for (var currentRow = 0; currentRow <= 5; ++currentRow) {
+		for (var currentColumn = 0; currentColumn <=4; ++currentColumn) {
+			var currentX = dataFrames.get(currentRow,currentColumn, 0);
+			var shiftedX = currentX + horizontalShift;
+			dataFrames.set(currentRow, currentColumn, 0, shiftedX);
+		}
+	}
+
+	// 4th Sheet - x2
+	for (currentRow = 0; currentRow <= 5; ++currentRow) {
+		for (currentColumn = 0; currentColumn <=4; ++currentColumn) {
+			currentX = dataFrames.get(currentRow,currentColumn, 3);
+			shiftedX = currentX + horizontalShift;
+			dataFrames.set(currentRow, currentColumn, 3, shiftedX);
+		}
+	}*/
+}
+
+// Handle Enemy
+function HandleEnemy() {
+
+	if (!enemyAlive) {
+
+		//Generate new enemy w/ new element:
+		//Random num 0 to 3
+		enemyID = Math.floor(Math.random() * 4);
+
+		//Enum element to string
+		SelectAndPrintEnemyElement();
+
+		//Summon enemy!
+		enemyAlive = true;
+
+		//if dead, increase counter
+		wins += 1;
+	}
+
+	else {
+		//Check if enemy alive
+		enemyAlive = CheckIfEnemyAlive();
+	}
+
+	//Always print element @ .80 screen width
+	text("Enemy Element:", enemyElementTextX * (7/9), enemyElementTextY)
+	SelectAndPrintEnemyElement();
+
+	//Print stats
+	var winCounter = "Wins: " + wins;
+	text(winCounter, enemyElementTextX * (7/9), enemyElementTextY * 2)
+
+}
+
+function SelectAndPrintEnemyElement() {
+
+	switch (enemyID) {
+		case 0:
+			text("Air", enemyElementTextX, enemyElementTextY);
+			enemyElement = "AIR";
+			break;
+		case 1:
+			text("Water", enemyElementTextX, enemyElementTextY);
+			enemyElement = "WATER";
+			break;
+		case 2:
+			text("Earth", enemyElementTextX, enemyElementTextY);
+			enemyElement = "EARTH";
+			break;
+		case 3:
+			text("Fire", enemyElementTextX, enemyElementTextY);
+			enemyElement = "FIRE";
+			break;
+		/*case 4:
+        case 5:
+        case 6:*/
+		default:
+			text("Error: Enemy ID Out Of Range", enemyElementTextX, enemyElementTextY);
+			break;
+	}
+}
+
+function CheckIfEnemyAlive() {
+
+	console.log("USER:",userElement,"ENEMY:",enemyElement);
+
+	//Element Weaknesses (4)
+
+	//Air > Water
+	if (userElement === "AIR" && enemyElement === "WATER") {
+		return false;
+	}
+
+	//Water > Earth
+	else if (userElement === "WATER" && enemyElement === "EARTH") {
+		return false;
+	}
+
+	//Earth > Fire
+	else if (userElement === "EARTH" && enemyElement === "FIRE") {
+		return false;
+	}
+
+	//Fire > Air
+	else if (userElement === "FIRE" && enemyElement === "AIR") {
+		return false;
+	}
+
+	//No weakness = no change
+	return true;
+}
+
 // Handle Frame
 function HandleFrame(frame) {
 
 	// Num hands
-	var handCount = frame.hands.length;
+	handCount = frame.hands.length;
 
 	// data on hands
-	var hand1 = frame.hands[0];
-	var hand2 = frame.hands[1];
+	hand1 = frame.hands[0];
+	hand2 = frame.hands[1];
 
 	// Interaction Box
 	var interactionBox = frame.interactionBox;
@@ -407,7 +721,7 @@ function HandleBone(bone, handCount, fingerIndex, interactionBox) {
 			stroke(red, blue,  25);
 		}*/
 
-		// GREEN IF 1 HAND
+		/*// GREEN IF 1 HAND
 		if (handCount === 1) {
 
 			if (boneType === 0) {
@@ -433,43 +747,28 @@ function HandleBone(bone, handCount, fingerIndex, interactionBox) {
 				stroke('rgb(179, 36, 0)');
 			}
 
+		}*/
+
+		//Set hand colors
+		if (boneType === 0) {
+			stroke('rgb(179, 255, 224)');
+		} else if (boneType === 1) {
+			stroke('rgb(77, 255, 184)');
+		} else if (boneType === 2) {
+			stroke('rgb(0, 230, 138)');
+		} else if (boneType === 3) {
+			stroke('rgb(0, 153, 92)');
 		}
 
 		strokeWeight(zStrokeWeight/5);
 
 		line(canvasX1,canvasY1,canvasX2,canvasY2);
 
-		HandleElement(bone, handCount, fingerIndex, interactionBox);
+		HandleElement(bone, handCount, fingerIndex, boneType, canvasX1, canvasY1);
 	}
 	catch(err) {
 		// console.log("Drawing line failed");
 	}
-}
-
-function ScaleElement() {
-	/*var xValues = dataFrames.slice([],[],[0,6,3]);
-
-	var currentMean = xValues.mean();
-
-	var horizontalShift = 0.5 - currentMean;
-
-	// 1st Sheet - x1
-	for (var currentRow = 0; currentRow <= 5; ++currentRow) {
-		for (var currentColumn = 0; currentColumn <=4; ++currentColumn) {
-			var currentX = dataFrames.get(currentRow,currentColumn, 0);
-			var shiftedX = currentX + horizontalShift;
-			dataFrames.set(currentRow, currentColumn, 0, shiftedX);
-		}
-	}
-
-	// 4th Sheet - x2
-	for (currentRow = 0; currentRow <= 5; ++currentRow) {
-		for (currentColumn = 0; currentColumn <=4; ++currentColumn) {
-			currentX = dataFrames.get(currentRow,currentColumn, 3);
-			shiftedX = currentX + horizontalShift;
-			dataFrames.set(currentRow, currentColumn, 3, shiftedX);
-		}
-	}*/
 }
 
 function Timer() {
@@ -477,66 +776,6 @@ function Timer() {
 	timeChangeInMilliseconds = currentTime - timeSinceLastChange;
 	timeChangeInSeconds = timeChangeInMilliseconds/1000;
 	return timeChangeInSeconds > timeLimit;
-}
-
-function HandleElement(bone, handCount, fingerIndex, interactionBox) {
-	try {
-		//Set Vars
-		textSize(32);
-		var diameter = 30;
-
-		// Handle Element
-		// Air = 0
-		if (element === 0) {
-
-			//If bone is tip of middle finger
-			if (fingerIndex === 2 && boneType === 3) {
-
-				//Color = Light Grey
-				stroke('rgb(214, 214, 214)');
-				fill('rgb(214, 214, 214)');
-
-				//Draw a circle that appears to be in front of hand, hopefully
-				circle(canvasX1, canvasY1 + 200, diameter);
-
-				//Write text
-				strokeWeight(1);
-				text('Air', 100, 100);
-			}
-		}
-
-		//Fire = 1
-		else if (element === 1) {
-
-			//If bone is 1st knuckle of middle finger
-			if (fingerIndex === 2 && boneType === 1) {
-
-				//Color = Red Orange
-				stroke('rgb(252, 104, 40)');
-				fill('rgb(252, 104, 40)');
-
-				//Draw a circle that appears to be in front of hand, hopefully
-				circle(canvasX1, canvasY1 - 20, diameter);
-
-				//Write text
-				strokeWeight(1);
-				text('Fire', 100, 100);
-
-				//SCALE LOCATION
-				// newCoordinate = ((oldCoordinate - newMin) * factorToScaleBy) / (newMax - newMin);
-				var elementX = ((canvasX1 - 0) * 1) / (window.innerWidth - 0);
-				var elementY = ((canvasY1 - 0) * 1) / (window.innerHeight - 0);
-
-				//Draw a circle that appears to be in front of hand, hopefully
-				circle(elementX, elementY, diameter);
-				// console.log("X: ", canvasX1, "Y: ", canvasY1);
-			}
-		}
-	}
-	catch(err) {
-
-	}
-
 }
 
 function TrainKNNIfNotDoneYet() {
@@ -593,6 +832,12 @@ Leap.loop(controllerOptions, function(frame) {
 	try {
 		clear();
 
+		//Set Vars for text
+		strokeWeight(1);
+		fill('rgb(0, 0, 0)');
+		stroke('rgb(0, 0, 0)');
+
+		HandleEnemy();
 		HandleFrame(frame);
 
 		DetermineState(frame);
