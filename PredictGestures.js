@@ -577,9 +577,6 @@ function SelectAndPrintEnemyElement() {
 			text("Fire", enemyElementTextX, enemyElementTextY);
 			enemyElement = "FIRE";
 			break;
-		/*case 4:
-        case 5:
-        case 6:*/
 		default:
 			text("Error: Enemy ID Out Of Range", enemyElementTextX, enemyElementTextY);
 			break;
