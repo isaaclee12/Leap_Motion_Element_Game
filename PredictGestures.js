@@ -173,6 +173,9 @@ function train() {
 		features = air1.pick(null,null,null,i);
 		features = centerData(features);
 		knnClassifier.addExample(features.tolist(), 0);
+		features = air1.pick(null,null,null,i);
+		features = centerMirrorData(features);
+		knnClassifier.addExample(features.tolist(), 0);
 		/*features = air2.pick(null,null,null,i);
 		features = centerData(features);
 		knnClassifier.addExample(features.tolist(), 0);
@@ -193,20 +196,43 @@ function train() {
 		features = fire1.pick(null,null,null,i);
 		features = centerData(features);
 		knnClassifier.addExample(features.tolist(), 1);
+		features = fire1.pick(null,null,null,i);
+		features = centerMirrorData(features);
+		knnClassifier.addExample(features.tolist(), 1);
+
 		features = fire2.pick(null,null,null,i);
 		features = centerData(features);
 		knnClassifier.addExample(features.tolist(), 1);
+		features = fire2.pick(null,null,null,i);
+		features = centerMirrorData(features);
+		knnClassifier.addExample(features.tolist(), 1);
+
 		features = fire3.pick(null,null,null,i);
 		features = centerData(features);
 		knnClassifier.addExample(features.tolist(), 1);
+		features = fire3.pick(null,null,null,i);
+		features = centerMirrorData(features);
+		knnClassifier.addExample(features.tolist(), 1);
+
 		features = fire4.pick(null,null,null,i);
 		features = centerData(features);
 		knnClassifier.addExample(features.tolist(), 1);
+		features = fire4.pick(null,null,null,i);
+		features = centerMirrorData(features);
+		knnClassifier.addExample(features.tolist(), 1);
+
 		features = fire5.pick(null,null,null,i);
 		features = centerData(features);
 		knnClassifier.addExample(features.tolist(), 1);
+		features = fire5.pick(null,null,null,i);
+		features = centerMirrorData(features);
+		knnClassifier.addExample(features.tolist(), 1);
+
 		features = fire6.pick(null,null,null,i);
 		features = centerData(features);
+		knnClassifier.addExample(features.tolist(), 1);
+		features = fire6.pick(null,null,null,i);
+		features = centerMirrorData(features);
 		knnClassifier.addExample(features.tolist(), 1);
 
 	}
@@ -259,6 +285,10 @@ function GotResults(err, result) {
 
 	if (parseInt(result.label) == 0) {
 		element = 0;
+	}
+
+	else if (parseInt(result.label) == 1) {
+		element = 1;
 	}
 
 	// print label:
@@ -405,13 +435,95 @@ function HandleBone(bone, handCount, fingerIndex, interactionBox) {
 
 		line(canvasX1,canvasY1,canvasX2,canvasY2);
 
-		// Handle Element
-		if (element === 0) {
-
-		}
+		HandleElement(bone, handCount, fingerIndex, interactionBox);
 	}
 	catch(err) {
 		// console.log("Drawing line failed");
+	}
+}
+
+function ScaleElement() {
+	/*var xValues = dataFrames.slice([],[],[0,6,3]);
+
+	var currentMean = xValues.mean();
+
+	var horizontalShift = 0.5 - currentMean;
+
+	// 1st Sheet - x1
+	for (var currentRow = 0; currentRow <= 5; ++currentRow) {
+		for (var currentColumn = 0; currentColumn <=4; ++currentColumn) {
+			var currentX = dataFrames.get(currentRow,currentColumn, 0);
+			var shiftedX = currentX + horizontalShift;
+			dataFrames.set(currentRow, currentColumn, 0, shiftedX);
+		}
+	}
+
+	// 4th Sheet - x2
+	for (currentRow = 0; currentRow <= 5; ++currentRow) {
+		for (currentColumn = 0; currentColumn <=4; ++currentColumn) {
+			currentX = dataFrames.get(currentRow,currentColumn, 3);
+			shiftedX = currentX + horizontalShift;
+			dataFrames.set(currentRow, currentColumn, 3, shiftedX);
+		}
+	}*/
+}
+
+function HandleElement(bone, handCount, fingerIndex, interactionBox) {
+	try {
+		//Set Vars
+		textSize(32);
+		var diameter = 30;
+
+		// Handle Element
+		// Air = 0
+		if (element === 0) {
+
+			//If bone is tip of middle finger
+			if (fingerIndex === 2 && boneType === 3) {
+
+				//Color = Light Grey
+				stroke('rgb(214, 214, 214)');
+				fill('rgb(214, 214, 214)');
+
+				//Draw a circle that appears to be in front of hand, hopefully
+				circle(canvasX1, canvasY1 + 200, diameter);
+
+				//Write text
+				strokeWeight(1);
+				text('Air', 100, 100);
+			}
+		}
+
+		//Fire = 1
+		else if (element === 1) {
+
+			//If bone is 1st knuckle of middle finger
+			if (fingerIndex === 2 && boneType === 1) {
+
+				//Color = Red Orange
+				stroke('rgb(252, 104, 40)');
+				fill('rgb(252, 104, 40)');
+
+				//Draw a circle that appears to be in front of hand, hopefully
+				circle(canvasX1, canvasY1 - 20, diameter);
+
+				//Write text
+				strokeWeight(1);
+				text('Fire', 100, 100);
+
+				//SCALE LOCATION
+				// newCoordinate = ((oldCoordinate - newMin) * factorToScaleBy) / (newMax - newMin);
+				var elementX = ((canvasX1 - 0) * 1) / (window.innerWidth - 0);
+				var elementY = ((canvasY1 - 0) * 1) / (window.innerHeight - 0);
+
+				//Draw a circle that appears to be in front of hand, hopefully
+				circle(elementX, elementY, diameter);
+				// console.log("X: ", canvasX1, "Y: ", canvasY1);
+			}
+		}
+	}
+	catch(err) {
+
 	}
 
 }
@@ -450,14 +562,14 @@ function DetermineState(frame) {
 
 }
 
-// Hand Uncentered
+// 1 Hand
 function HandleState1(frame) {
 	// Draw hands
 	HandleFrame(frame);
 	test();
 }
 
-// Hand Centered
+// 2 Hands
 function HandleState2(frame) {
 	// Draw hands
 	HandleFrame(frame);
