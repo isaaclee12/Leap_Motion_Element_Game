@@ -26,6 +26,10 @@ var programState = 0;
 var itemToPredict = 0;
 var element = -1;
 
+//Time
+var timeSinceLastChange = new Date();
+var timeLimit = 5;
+
 // Center Data
 function centerData(features) {
 
@@ -466,6 +470,13 @@ function ScaleElement() {
 			dataFrames.set(currentRow, currentColumn, 3, shiftedX);
 		}
 	}*/
+}
+
+function Timer() {
+	currentTime = new Date();
+	timeChangeInMilliseconds = currentTime - timeSinceLastChange;
+	timeChangeInSeconds = timeChangeInMilliseconds/1000;
+	return timeChangeInSeconds > timeLimit;
 }
 
 function HandleElement(bone, handCount, fingerIndex, interactionBox) {

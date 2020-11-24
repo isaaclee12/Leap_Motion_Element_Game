@@ -157,20 +157,67 @@ function HandleFrame(frame) {
 	var handCount = frame.hands.length;
 
 	//data on first hand
-	var hand = frame.hands[0];
+	var hand1 = frame.hands[0];
+	var hand2 = frame.hands[1];
 
 	//Interaction Box
 	var interactionBox = frame.interactionBox;
 
-	HandleHand(hand, handCount, interactionBox);
+	HandleHand(hand1, handCount, interactionBox);
+	HandleHand(hand2, handCount, interactionBox);
+}
+
+//Time
+var timeSinceLastChange = new Date();
+var timeLimit = 3;
+var timeChangeInSeconds = 0;
+var timerOn = false;
+
+function Timer() {
+	//Timer runs until current time is 3 seconds after
+	if (timeChangeInSeconds < timeLimit) {
+		currentTime = new Date();
+		timeChangeInMilliseconds = currentTime - timeSinceLastChange;
+		timeChangeInSeconds = timeChangeInMilliseconds/1000;
+		//console.log(timeChangeInSeconds);
+
+		return false;
+	}
+	//New init time
+	timeSinceLastChange = new Date();
+	timeChangeInSeconds = 0;
+
+	return true;
+
+	//return timeChangeInSeconds > timeLimit;
 }
 
 function RecordData() {
-	if (previousNumHands === 2 && currentNumHands === 1) {
+	/*if (previousNumHands === 2 && currentNumHands === 1) {
 		// Capture the data when you go from 2 hands to 1 hand
 		console.log( framesOfData.toString()); //.pick(null,null,null,0)
 		background(51);
+	}*/
+
+	if (previousNumHands === 1 && currentNumHands === 2) {
+		//Reset Timer
+		timerOn = true;
 	}
+
+	//If timing
+	if (timerOn) {
+		if (Timer()) {
+			// Capture the data when you go from 1 hand to 2 hands (Timer)
+			console.log( framesOfData.toString()); //.pick(null,null,null,0)
+			background(51);
+
+			//Turn it off
+			timerOn = false;
+		}
+	}
+
+	text(timeChangeInSeconds, 100, 100);
+
 
 //Check if 2 hands
 
