@@ -38,6 +38,7 @@ var userElementTextY = window.innerHeight/10;
 
 var enemyAlive = false;
 var enemyID = -1;
+var lastEnemyID = -1;
 var enemyElement = "";
 
 var enemyElementTextX = window.innerWidth * .90;
@@ -533,6 +534,11 @@ function HandleEnemy() {
 		//Random num 0 to 3
 		enemyID = Math.floor(Math.random() * 4);
 
+		//Validation: Make sure element is different this time
+		while(enemyID === lastEnemyID) {
+			enemyID = Math.floor(Math.random() * 4);
+		}
+
 		//Enum element to string
 		SelectAndPrintEnemyElement();
 
@@ -541,6 +547,9 @@ function HandleEnemy() {
 
 		//if dead, increase counter
 		wins += 1;
+
+		// Keep track of last enemy id
+		lastEnemyID = enemyID;
 	}
 
 	else {
@@ -615,25 +624,28 @@ function CheckIfEnemyAlive() {
 var timeChangeInSeconds = 0;
 var score = 0;
 function recordScore() {
-	//Get time
+	//Get time since last win
 	currentTime = new Date();
 	timeChangeInMilliseconds = currentTime - timeSinceLastChange;
 	timeChangeInSeconds = timeChangeInMilliseconds/1000;
 
-	//Record score (100 - time)
-	score = 100 - timeChangeInSeconds;
+	//Record score (100 - 5*time)
+	score = 100 - (parseInt(timeChangeInSeconds) * 20);
 
-	//Score minimum 1
-	if (score < 1) {
-		score = 1;
+	//Score minimum 10
+	if (score < 10) {
+		score = 10;
 	}
+
+	//Write score to file
+	WriteScoreToFile();
 
 	//New init time
 	timeSinceLastChange = new Date();
 	timeChangeInSeconds = 0;
 
-	return true;
-
+	// text(score, scoreTextX, scoreTextY - (window.innerHeight/20))
+	//return true;
 	/*//Timer runs until current time is 3 seconds after
 	if (timeChangeInSeconds < timeLimit) {
 		currentTime = new Date();
@@ -643,6 +655,22 @@ function recordScore() {
 
 		return false;
 	}*/
+}
+function WriteScoreToFile() {
+
+	//If username in list
+	//username
+
+	//https://stackoverflow.com/questions/37167755/writing-to-file-using-ajax
+	//send score to list
+	$.ajax({
+		type: 'POST',
+		url: "PredictGestures.php",
+		data: {f_score: score},
+		success: function(result) {
+			console.log('the data was successfully sent to the server');
+		}
+	})
 }
 
 // Handle Frame
@@ -869,12 +897,15 @@ function CreateNewUser(username,list) {
     print(usernameList);*/
 
 }
-function CreateSignInItem(username,list) {
+/*function CreateSignInItem(username,list) {
 	var item = document.createElement('li');
 	item.id = String(username) + "_signins";
 	item.innerHTML = 1;
 	list.appendChild(item);
-}
+}*/
+
+//Establish global username var
+var username;
 //Sign in
 function SignIn() {
 	username = document.getElementById('username').value;
@@ -911,10 +942,12 @@ function DisplayList() {
 	// Establish list
 	list = document.getElementById('users');
 
-	//Establish list draw area
-
-
 	ReadFile();
+
+	//Draw current score
+	text("Current Score: " + score, scoreTextX, scoreTextY - (window.innerHeight/20));
+
+	//Draw list in order in bottom left
 	for (var i = 0; i < usernameList.length; i++) {
 
 		//Display each score as a list,

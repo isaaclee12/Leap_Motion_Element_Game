@@ -60,9 +60,9 @@
         echo $js_code;
     }
 
-    print '<p>POST Array:</p><pre>';
+    /*print '<p>POST Array:</p><pre>';
     print_r($_POST);
-    print '</pre>';
+    print '</pre>';*/
 
 
 
@@ -72,8 +72,9 @@
         //VARS
         $dataIsClean = true;
 
-        //Sanitize data of username
+        //Sanitize data
         $username = filter_var($_POST["f_username"], FILTER_SANITIZE_STRING);
+        $score = $_POST["f_score"];//filter_var(, FILTER_SANITIZE_INT);
 
         //SERVER SIDE VALIDATION
         if ($username == "") {
@@ -118,8 +119,11 @@
             echo '<p>IN LIST:</p>';
             print_r($usernameList);*/
 
+            //"\n" .
+            $usernameWithScore = $username . ":0";
+
             //If username in array
-            if (array_search($username, $usernameList) !== false) {
+            if (array_search($usernameWithScore, $usernameList) !== false) {
                 //Match found.
                 echo '<p>Username already entered.</p>';
                 $duplicateFound = true;
@@ -127,7 +131,7 @@
 
             //If not in array
             else {
-                echo '<p>Adding new user:' . $username . '</p>';
+                echo '<p>Adding new user:' . $usernameWithScore . '</p>';
                 echo '<br><br>';
             }
 
@@ -145,9 +149,30 @@
                 }
             }*/
 
-            //If match was found, don't write
+            //If match was found, overwrite score
             if ($duplicateFound) {
-                console_log("Duplicate Found, cannot write.");
+                //console_log("Duplicate Found, cannot write.");
+
+                //Attempt to open file
+                @ $fp = fopen("usernames.txt", 'a');
+
+                //On fail
+                if (!$fp) {
+                    echo '<p><strong>Cannot generate message file</strong></p></body></html>';
+                    exit;
+                }
+
+                //On success
+                else {
+
+                    //Add newline and score
+                    $line = "\n" . $username . ":" . $score;
+
+                    //write username to file
+                    fwrite($fp, $line);
+                    print '<p>line added to file: ' . $line . '</p>';
+                }
+
             }
 
             //No match found
@@ -166,14 +191,12 @@
                 //On success
                 else {
 
-                    //Add newline
-                    $username = "\n" . $username;
+                    //Add newline and score
+                    $username = "\n" . $username . ":0";
 
                     //write username to file
                     fwrite($fp, $username);
                     print '<p>Username added to file: ' . $username . '</p>';
-
-                    //Redirect to main game
                 }
             }
         }
@@ -181,7 +204,7 @@
     ?>
     <!--PREVENT REFRESH ON SUBMIT-->
     <!--https://stackoverflow.com/questions/23507608/form-submission-without-page-refresh-->
-    <!--<script type="text/javascript">
+    <script type="text/javascript">
         $(document).ready(function () {
             $('#myform').on('submit', function(e) {
                 e.preventDefault();
@@ -198,7 +221,7 @@
                 });
             });
         });
-    </script>-->
+    </script>
 
     <form id="myform" method="POST" action="<?php echo $_SERVER['PHP_SELF'];?>">
         Enter Userame: <input id="username" type="text" name="f_username" placeholder="name">
