@@ -12,71 +12,81 @@
     </head>
 
     <body>
-        <?php function getData($field) {
-        if (!isset($_POST[$field])) {
-        $data = "";
+        <main>
+<?php
+print '<p>Post Array:</p><pre>';
+print_r($_POST);
+print '</pre>';
+
+
+//process form when it is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    //VARS
+    $dataIsClean = true;
+
+    //Sanitize data of username
+    $username = filter_var($_POST["username"], FILTER_SANITIZE_STRING);
+
+    //SERVER SIDE VALIDATION
+    if ($username == "") {
+        print '<p class="error">Please enter your username.</p>';
+        $dataIsClean = false;
+    }
+
+    if (empty($username)) {
+        print '<p class="error">Username Empty.</p>';
+        $dataIsClean = false;
+    }
+
+    //print
+    print '<p>Username: ' . $username . '</p>';
+
+    //data to file
+    If data clean,
+    if ($dataIsClean) {
+        //Write to file
+        @ $fp = fopen("usernames.txt", 'a');
+        if (!$fp) {
+            echo '<p><strong>Cannot generate message file</strong></p></body></html>';
+            exit;
         }
         else {
-        $data = trim($_POST[$field]);
-        $data = htmlspecialchars($data);
+            //get username
+            $outputstring  = $username;
+            fwrite($fp, $outputstring);
+            print '<p>Message inserted</p>';
         }
-        return $data;
-        }
-        ?>
-        <main>
-            <?php
-            print '<p>Post Array:</p><pre>';
-            print_r($_POST);
-            print '</pre>';
+    }
 
-            //process form when it is submitted
-            //Sanitize data of username
-            //$firstName = filter_var($_POST["username"], FILTER_SANITIZE_STRING);
+}
 
-            //print '<p>POST WORKED</p>';
+//Initialize Vars
+/*$boolWritingToFile = False;
 
-            //Write to file
-            @ $fp = fopen("usernames.txt", 'a');
-            if (!$fp) {
-                echo '<p><strong>Cannot generate message file</strong></p></body></html>';
-                exit;
-            }
-            else {
-                //get username
-                $outputstring  = filter_var($_POST["username"], FILTER_SANITIZE_STRING);
-                fwrite($fp, $outputstring);
-                print '<p>Message inserted</p>';
-            }
+//process form when it is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {}
 
-            /*if ($_SERVER["REQUEST_METHOD"] == "POST") {
+//Writing to File
+if ($boolWritingToFile) {
 
-            }*/
+    //Open the file
+    $myfile = fopen("usernames.txt", "a") or die("Unable to open file!");
 
-            //Initialize Vars
-            /*$boolWritingToFile = False;
+    //Write text
+    $txt = "\nEgg\n";
+    fwrite($myfile, $txt);
 
-            //process form when it is submitted
-            if ($_SERVER["REQUEST_METHOD"] == "POST") {}
+    //If the file exists
+    if ($myfile) {
+        print '<p>Written to file successfully.</p>';
+        fclose($myfile);
+    }
+}*/
+?>
 
-            //Writing to File
-            if ($boolWritingToFile) {
-
-                //Open the file
-                $myfile = fopen("usernames.txt", "a") or die("Unable to open file!");
-
-                //Write text
-                $txt = "\nEgg\n";
-                fwrite($myfile, $txt);
-
-                //If the file exists
-                if ($myfile) {
-                    print '<p>Written to file successfully.</p>';
-                    fclose($myfile);
-                }
-            }*/
-            ?>
-            <form id="myform">
-                <input id="username" type="text" name="username" placeholder="name">
+            <form id="myform" method="post" action="<?php echo $_SERVER['PHP_SELF'];?>">
+                Enter Userame: <input id="username" type="text" name="f_username" placeholder="name">
                 <button onclick="return SignIn();" id="button" type="submit">Sign in</button>
             </form>
         </main>
@@ -88,4 +98,26 @@
     </body>
 
 
+</html>
+
+
+<!DOCTYPE html>
+<html>
+<body>
+
+
+
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+// collect value of input field
+$name = $_POST['fname'];
+if (empty($name)) {
+echo "Name is empty";
+} else {
+echo $name;
+}
+}
+?>
+
+</body>
 </html>
