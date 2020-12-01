@@ -823,6 +823,65 @@ function HandleState2(frame) {
 	test();
 }
 
+//Check if New User
+function IsNewUser(username,list) {
+	// console.log(list);
+	var users = list.children;
+
+	usernameFound = false;
+
+	for (var i = 0; i < users.length; i++) {
+		if (users[i].innerHTML == username) {
+			usernameFound = true;
+		}
+		// console.log("inner: ",users[i].innerHTML);
+	}
+
+	return usernameFound == false;
+	// usernameFound = false;
+}
+
+//Create new user
+function CreateNewUser(username,list) {
+	var item = document.createElement('li');
+	item.id = String(username) + "_name";
+	item.innerHTML = String(username);
+	list.appendChild(item);
+}
+
+//Create new user
+function CreateSignInItem(username,list) {
+	var item = document.createElement('li');
+	item.id = String(username) + "_signins";
+	item.innerHTML = 1;
+	list.appendChild(item);
+}
+
+//Sign in
+function SignIn() {
+	username = document.getElementById('username').value;
+	console.log(username);
+
+	var list = document.getElementById('users');
+
+	//New User
+	if (IsNewUser(username,list)) {
+		CreateNewUser(username,list);
+		CreateSignInItem(username,list);
+	}
+	else {
+		ID = String(username) + "_signins";
+		listItem = document.getElementById( ID );
+		listItem.innerHTML = parseInt(listItem.innerHTML) + 1;
+	}
+
+	console.log("list: ", list.innerHTML); //innerHTML
+
+	// console.log("Users: ", users);
+
+	return false;
+}
+
 // LEAP TIME
 Leap.loop(controllerOptions, function(frame) {
 	// Exception just so we don't crash on error
