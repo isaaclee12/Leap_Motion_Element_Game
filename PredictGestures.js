@@ -66,7 +66,6 @@ function centerData(features) {
 
 	return features;
 }
-
 function centerXData(dataFrames) {
 
 	var xValues = dataFrames.slice([],[],[0,6,3]);
@@ -93,7 +92,6 @@ function centerXData(dataFrames) {
 		}
 	}
 }
-
 function centerYData(dataFrames) {
 
 	var yValues = dataFrames.slice([],[],[1,6,4]);
@@ -120,7 +118,6 @@ function centerYData(dataFrames) {
 		}
 	}
 }
-
 function centerZData(dataFrames) {
 
 	var zValues = dataFrames.slice([],[],[2,6,5]);
@@ -161,7 +158,6 @@ function centerMirrorData(features) {
 
 	return features;
 }
-
 function mirrorData(dataFrames) {
 
 	var xValues = dataFrames.slice([],[],[0,6,3]);
@@ -192,6 +188,11 @@ function mirrorData(dataFrames) {
 }
 
 // Train
+function TrainKNNIfNotDoneYet() {
+	if (trainingCompleted === false) {
+		train();
+	}
+}
 function train() {
 
 	for (var i = 0; i < 2; i++) {
@@ -314,8 +315,6 @@ function train() {
 
 	trainingCompleted = true;
 }
-
-// Test
 function test() {
 
 	// Extract ith 3D Tensor
@@ -351,8 +350,6 @@ function test() {
 
 
 }
-
-// Got Results
 function GotResults(err, result) {
 
 	// console.log("PREDICTED LABEL: ", parseInt(result.label)); // "INDEX: ",testingSampleIndex,
@@ -497,7 +494,6 @@ function HandleElement(bone, handCount, fingerIndex, boneType, canvasX1, canvasY
 	}
 
 }
-
 function ScaleElement() {
 	/*var xValues = dataFrames.slice([],[],[0,6,3]);
 
@@ -527,7 +523,11 @@ function ScaleElement() {
 // Handle Enemy
 function HandleEnemy() {
 
+	//If enemy is dead
 	if (!enemyAlive) {
+
+		//Record Score
+		recordScore();
 
 		//Generate new enemy w/ new element:
 		//Random num 0 to 3
@@ -557,7 +557,6 @@ function HandleEnemy() {
 	text(winCounter, enemyElementTextX * (7/9), enemyElementTextY * 2)
 
 }
-
 function SelectAndPrintEnemyElement() {
 
 	switch (enemyID) {
@@ -582,7 +581,6 @@ function SelectAndPrintEnemyElement() {
 			break;
 	}
 }
-
 function CheckIfEnemyAlive() {
 
 	console.log("USER:",userElement,"ENEMY:",enemyElement);
@@ -613,6 +611,40 @@ function CheckIfEnemyAlive() {
 	return true;
 }
 
+//var timeSinceLastChange = new Date();
+var timeChangeInSeconds = 0;
+var score = 0;
+function recordScore() {
+	//Get time
+	currentTime = new Date();
+	timeChangeInMilliseconds = currentTime - timeSinceLastChange;
+	timeChangeInSeconds = timeChangeInMilliseconds/1000;
+
+	//Record score (100 - time)
+	score = 100 - timeChangeInSeconds;
+
+	//Score minimum 1
+	if (score < 1) {
+		score = 1;
+	}
+
+	//New init time
+	timeSinceLastChange = new Date();
+	timeChangeInSeconds = 0;
+
+	return true;
+
+	/*//Timer runs until current time is 3 seconds after
+	if (timeChangeInSeconds < timeLimit) {
+		currentTime = new Date();
+		timeChangeInMilliseconds = currentTime - timeSinceLastChange;
+		timeChangeInSeconds = timeChangeInMilliseconds/1000;
+		//console.log(timeChangeInSeconds);
+
+		return false;
+	}*/
+}
+
 // Handle Frame
 function HandleFrame(frame) {
 
@@ -629,8 +661,6 @@ function HandleFrame(frame) {
 	HandleHand(hand1, handCount, interactionBox);
 	HandleHand(hand2, handCount, interactionBox);
 }
-
-// Handle Hand
 function HandleHand(hand, handCount, interactionBox) {
 
 	// fingers
@@ -654,8 +684,6 @@ function HandleHand(hand, handCount, interactionBox) {
 	}
 
 }
-
-// Handle Bone
 function HandleBone(bone, handCount, fingerIndex, interactionBox) {
 
 	try {
@@ -768,24 +796,6 @@ function HandleBone(bone, handCount, fingerIndex, interactionBox) {
 	}
 }
 
-function Timer() {
-	currentTime = new Date();
-	timeChangeInMilliseconds = currentTime - timeSinceLastChange;
-	timeChangeInSeconds = timeChangeInMilliseconds/1000;
-	return timeChangeInSeconds > timeLimit;
-}
-
-function TrainKNNIfNotDoneYet() {
-	if (trainingCompleted === false) {
-		train();
-	}
-}
-
-// No Hands
-function HandleState0(frame) {
-	TrainKNNIfNotDoneYet();
-}
-
 // Determine State
 function DetermineState(frame) {
 
@@ -808,20 +818,28 @@ function DetermineState(frame) {
 	}
 
 }
-
+// No Hands
+function HandleState0(frame) {
+	TrainKNNIfNotDoneYet();
+}
 // 1 Hand
 function HandleState1(frame) {
 	// Draw hands
 	HandleFrame(frame);
 	test();
 }
-
 // 2 Hands
 function HandleState2(frame) {
 	// Draw hands
 	HandleFrame(frame);
 	test();
 }
+
+//SIGN IN
+
+//Global var for users list
+usernameList = [];
+var list;
 
 //Check if New User
 function IsNewUser(username,list) {
@@ -840,46 +858,108 @@ function IsNewUser(username,list) {
 	return usernameFound == false;
 	// usernameFound = false;
 }
-
 //Create new user
 function CreateNewUser(username,list) {
 	var item = document.createElement('li');
 	item.id = String(username) + "_name";
 	item.innerHTML = String(username);
 	list.appendChild(item);
-}
 
-//Create new user
+	/*//Add to local list
+    print(usernameList);*/
+
+}
 function CreateSignInItem(username,list) {
 	var item = document.createElement('li');
 	item.id = String(username) + "_signins";
 	item.innerHTML = 1;
 	list.appendChild(item);
 }
-
 //Sign in
 function SignIn() {
 	username = document.getElementById('username').value;
-	console.log(username);
+	//console.log(username);
 
-	var list = document.getElementById('users');
+	// Establish list
+	list = document.getElementById('users');
+
+	//console.log("LIST INIT: ", can);
 
 	//New User
 	if (IsNewUser(username,list)) {
+		usernameList.push(username);
 		CreateNewUser(username,list);
-		CreateSignInItem(username,list);
+		//CreateSignInItem(username,list);
 	}
 	else {
-		ID = String(username) + "_signins";
-		listItem = document.getElementById( ID );
-		listItem.innerHTML = parseInt(listItem.innerHTML) + 1;
+		console.log(username, "is already registered.")
+		//ID = String(username) + "_signins";
+		//listItem = document.getElementById( ID );
+		//listItem.innerHTML = parseInt(listItem.innerHTML) + 1;
 	}
 
-	console.log("list: ", list.innerHTML); //innerHTML
+	console.log("list: ", list.innerHTML);
 
-	// console.log("Users: ", users);
+	//return false;
+	return true;
+}
 
-	return false;
+var scoreTextX = window.innerWidth/20;
+var scoreTextY = window.innerHeight/2;
+var scoreTextIncrementY = 0;
+function DisplayList() {
+	// Establish list
+	list = document.getElementById('users');
+
+	//Establish list draw area
+
+
+	ReadFile();
+	for (var i = 0; i < usernameList.length; i++) {
+
+		//Display each score as a list,
+		text(usernameList[i], scoreTextX, (scoreTextY + scoreTextIncrementY));
+
+		//Increment y
+		scoreTextIncrementY += window.innerHeight/20;
+	}
+
+	//Reset increment
+	scoreTextIncrementY = 0;
+}
+function ReadFile() {
+
+	//From: https://stackoverflow.com/questions/8137225/read-txt-file-via-client-javascript
+	var xmlhttp;
+	if (window.XMLHttpRequest)
+	{// code for IE7+, Firefox, Chrome, Opera, Safari
+		xmlhttp=new XMLHttpRequest();
+	}
+	else
+	{// code for IE6, IE5
+		xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	xmlhttp.open("GET","usernames.txt",false);
+	xmlhttp.send();
+	xmlDoc=xmlhttp.responseText;
+
+	//Got doc!
+	//console.log(xmlDoc.toString());
+
+	//Split names at newline to generate username list
+	usernameList = xmlDoc.split("\n")
+
+	//Add those to HTML
+	//Go through each item in list and add to user list
+	for (var i = 0; i < usernameList.length; i++) {
+
+		//Get username from file-list
+		var username = usernameList[i];
+
+		//Add to list
+		CreateNewUser(username, list);
+		//CreateSignInItem(username, list);
+	}
 }
 
 // LEAP TIME
@@ -892,6 +972,9 @@ Leap.loop(controllerOptions, function(frame) {
 		strokeWeight(1);
 		fill('rgb(0, 0, 0)');
 		stroke('rgb(0, 0, 0)');
+
+		//Always display score list
+		DisplayList()
 
 		HandleEnemy();
 		HandleFrame(frame);
