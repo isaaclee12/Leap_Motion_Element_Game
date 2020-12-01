@@ -82,21 +82,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
         //Search list
-        echo '<p>SEARCHING:</p>';
+        /*echo '<p>SEARCHING:</p>';
         print_r($username);
         echo '<p>IN LIST:</p>';
-        print_r($usernameList);
+        print_r($usernameList);*/
 
         //If username in array
         if (array_search($username, $usernameList) !== false) {
             //Match found.
-            echo '<p>FOUND MATCH</p>';
+            echo '<p>Username already entered.</p>';
             $duplicateFound = true;
         }
 
-        // If not
+        //If not in array
         else {
-            echo '<p>Match not found.</p>';
+            echo '<p>Adding new user:' . $username . '</p>';
             echo '<br><br>';
         }
 
@@ -141,6 +141,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 //write username to file
                 fwrite($fp, $username);
                 print '<p>Username added to file: ' . $username . '</p>';
+
+                //Redirect to main game
             }
         }
     }
