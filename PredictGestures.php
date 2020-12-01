@@ -48,6 +48,9 @@
 
 <body onload="DisplayList()">
 <main>
+    <script>WriteScoreToFile()</script>
+    <input type="hidden" id="score" value="<?php echo $score ?>" />
+
     <?php
 
     //console_log function https://stackify.com/how-to-log-to-console-in-php/
@@ -64,7 +67,7 @@
     print_r($_POST);
     print '</pre>';*/
 
-    $score = $_POST["f_score"];//filter_var(, FILTER_SANITIZE_INT);
+    $score = filter_var($_POST["f_score"], FILTER_SANITIZE_STRING);
     print '<p> SCORE: ' . $score . '</p>';
 
 
@@ -88,9 +91,6 @@
             $dataIsClean = false;
         }
 
-        //print
-        //print '<p>Username: ' . $username . '</p>';
-
         //data to file
         //If data clean,
         if ($dataIsClean) {
@@ -98,33 +98,22 @@
             //Establish var for duplicateFound
             $duplicateFound = false;
 
-
-
             /*https://www.w3schools.com/php/func_filesystem_readfile.asp*/
 
             //Read file
             $usernameList = file_get_contents("usernames.txt");
             //print_r($usernameList);
-            //print '<p></p>';
-
-
 
             //Make into list
             $usernameList = preg_split("/\s+/", $usernameList, -1, PREG_SPLIT_NO_EMPTY);
             //print_r($usernameList);
 
 
-            //Search list
-            /*echo '<p>SEARCHING:</p>';
-            print_r($username);
-            echo '<p>IN LIST:</p>';
-            print_r($usernameList);*/
-
             //"\n" .
-            $usernameWithScore = $username . ":0";
+            //$usernameWithScore = $username . ":0";
 
             //If username in array
-            if (array_search($usernameWithScore, $usernameList) !== false) {
+            if (array_search($username, $usernameList) !== false) {
                 //Match found.
                 echo '<p>Username already entered.</p>';
                 $duplicateFound = true;
@@ -132,49 +121,14 @@
 
             //If not in array
             else {
-                echo '<p>Adding new user:' . $usernameWithScore . '</p>';
+                echo '<p>Adding new user:' . $username . '</p>';
                 echo '<br><br>';
             }
 
-            /*//Scan list for stuff
-            for ($i = 0; $i < count($usernameList); $i++) {
-
-                print_r($usernameList[$i]);
-                print_r($username);
-                echo '<br>';
-
-                //If match found
-                if ($usernameList[$i] === $username) {
-                    echo '<p>FOUND MATCH</p>';
-                    $duplicateFound = true;
-                }
-            }*/
-
-            /*//If match was found, overwrite score
+            //If match was found, overwrite score
             if ($duplicateFound) {
                 //console_log("Duplicate Found, cannot write.");
-
-                //Attempt to open file
-                @ $fp = fopen("usernames.txt", 'a');
-
-                //On fail
-                if (!$fp) {
-                    echo '<p><strong>Cannot generate message file</strong></p></body></html>';
-                    exit;
-                }
-
-                //On success
-                else {
-
-                    //Add newline and score
-                    $line = "\n" . $username . ":" . $score;
-
-                    //write username to file
-                    fwrite($fp, $line);
-                    print '<p>line added to file: ' . $line . '</p>';
-                }
-
-            }*/
+            }
 
             //No match found
             else {
@@ -225,7 +179,7 @@
     </script>
 
     <form id="myform" method="POST" action="<?php echo $_SERVER['PHP_SELF'];?>">
-        Enter Userame: <input id="username" type="text" name="f_username" placeholder="name">
+        Enter Username: <input id="username" type="text" name="f_username" placeholder="name">
         <input onclick="return SignIn();" type="submit">
         <!--<button onclick="return SignIn();" id="button" type="submit">Sign in</button>-->
     </form>
@@ -234,6 +188,8 @@
 <ul id="users" style = "color:black">
     <!--<li>user1</li>-->
 </ul>
+
+<ul id="score" style="color:black"></ul>
 
 </body>
 </html>

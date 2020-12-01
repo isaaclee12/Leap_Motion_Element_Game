@@ -386,7 +386,7 @@ function GotResults(err, result) {
 	}
 
 	// print label:
-	console.log("PREDICTION: ", currentPrediction);
+	//console.log("PREDICTION: ", currentPrediction);
 
 	// Return it
 	return(parseInt(result.label));
@@ -592,7 +592,7 @@ function SelectAndPrintEnemyElement() {
 }
 function CheckIfEnemyAlive() {
 
-	console.log("USER:",userElement,"ENEMY:",enemyElement);
+	//console.log("USER:",userElement,"ENEMY:",enemyElement);
 
 	//Element Weaknesses (4)
 
@@ -623,6 +623,7 @@ function CheckIfEnemyAlive() {
 //var timeSinceLastChange = new Date();
 var timeChangeInSeconds = 0;
 var score = 0;
+var totalScore = 0;
 function recordScore() {
 	//Get time since last win
 	currentTime = new Date();
@@ -636,6 +637,9 @@ function recordScore() {
 	if (score < 10) {
 		score = 10;
 	}
+
+	//Add to total
+	totalScore += score;
 
 	//Write score to file
 	WriteScoreToFile();
@@ -651,13 +655,19 @@ function recordScore() {
 		currentTime = new Date();
 		timeChangeInMilliseconds = currentTime - timeSinceLastChange;
 		timeChangeInSeconds = timeChangeInMilliseconds/1000;
-		//console.log(timeChangeInSeconds);
 
 		return false;
 	}*/
 }
 var confirmWrite = "";
 function WriteScoreToFile() {
+
+	//Get div item
+	var list = document.getElementById('score');
+	var item = document.createElement('li');
+	item.id = String(score) + "_score";
+	item.innerHTML = String(score);
+	list.appendChild(item);
 
 	// confirmWrite += "sent";
 
@@ -667,18 +677,22 @@ function WriteScoreToFile() {
 	//https://stackoverflow.com/questions/37167755/writing-to-file-using-ajax
 	//send score to list
 	$(document).ready(function() {
-		$.ajax({
-			method: "POST",
-			type: "POST",
-			url: "PredictGestures.php",
-			data: {f_score: score},
-			success: function(result) {
-				//confirmWrite += "sent";
-				//console.log('the data was successfully sent to the server');
-			}
+
+		//send to score var
+		$("#score").focusout(function() {
+			$.ajax({
+				//method: "POST",
+				type: "POST",
+				url: "PredictGestures.php",
+				data: {f_score: String(score)},
+				dataType: "html",
+				success: function(result) {
+					// confirmWrite += "sent";
+					//console.log('the data was successfully sent to the server');
+				}
+			});
 		});
 	});
-
 
 }
 
@@ -895,6 +909,7 @@ function IsNewUser(username,list) {
 	return usernameFound == false;
 	// usernameFound = false;
 }
+
 //Create new user
 function CreateNewUser(username,list) {
 	var item = document.createElement('li');
@@ -918,12 +933,9 @@ var username;
 //Sign in
 function SignIn() {
 	username = document.getElementById('username').value;
-	//console.log(username);
 
 	// Establish list
 	list = document.getElementById('users');
-
-	//console.log("LIST INIT: ", can);
 
 	//New User
 	if (IsNewUser(username,list)) {
@@ -938,7 +950,7 @@ function SignIn() {
 		//listItem.innerHTML = parseInt(listItem.innerHTML) + 1;
 	}
 
-	console.log("list: ", list.innerHTML);
+	//console.log("list: ", list.innerHTML);
 
 	//return false;
 	return true;
@@ -957,7 +969,9 @@ function DisplayList() {
 	text(confirmWrite, 100, 100);
 
 	//Draw current score
-	text("Current Score: " + score, scoreTextX, scoreTextY - (window.innerHeight/20));
+	text("Latest Score: " + score, scoreTextX, scoreTextY - (2 * window.innerHeight/20));
+	text("Total Score: " + totalScore, scoreTextX, scoreTextY - (window.innerHeight/20));
+	console.log("Total Score:", totalScore);
 
 	//Draw list in order in bottom left
 	for (var i = 0; i < usernameList.length; i++) {
@@ -972,39 +986,44 @@ function DisplayList() {
 	//Reset increment
 	scoreTextIncrementY = 0;
 }
+
+var haveReadFile = false;
 function ReadFile() {
 
-	//From: https://stackoverflow.com/questions/8137225/read-txt-file-via-client-javascript
-	var xmlhttp;
-	if (window.XMLHttpRequest)
-	{// code for IE7+, Firefox, Chrome, Opera, Safari
-		xmlhttp=new XMLHttpRequest();
+	if (!haveReadFile) {
+		//From: https://stackoverflow.com/questions/8137225/read-txt-file-via-client-javascript
+		var xmlhttp;
+		if (window.XMLHttpRequest)
+		{// code for IE7+, Firefox, Chrome, Opera, Safari
+			xmlhttp=new XMLHttpRequest();
+		}
+		else
+		{// code for IE6, IE5
+			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		xmlhttp.open("GET","usernames.txt",false);
+		xmlhttp.send();
+		xmlDoc=xmlhttp.responseText;
+
+		//Split names at newline to generate username list
+		usernameList = xmlDoc.split("\n")
+
+		//Add those to HTML
+		//Go through each item in list and add to user list
+		for (var i = 0; i < usernameList.length; i++) {
+
+			//Get username from file-list
+			var username = usernameList[i];
+
+			//Add to list
+			CreateNewUser(username, list);
+			//CreateSignInItem(username, list);
+		}
+
+		//Lock out
+		haveReadFile = true;
 	}
-	else
-	{// code for IE6, IE5
-		xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-	}
-	xmlhttp.open("GET","usernames.txt",false);
-	xmlhttp.send();
-	xmlDoc=xmlhttp.responseText;
 
-	//Got doc!
-	//console.log(xmlDoc.toString());
-
-	//Split names at newline to generate username list
-	usernameList = xmlDoc.split("\n")
-
-	//Add those to HTML
-	//Go through each item in list and add to user list
-	for (var i = 0; i < usernameList.length; i++) {
-
-		//Get username from file-list
-		var username = usernameList[i];
-
-		//Add to list
-		CreateNewUser(username, list);
-		//CreateSignInItem(username, list);
-	}
 }
 
 // LEAP TIME
