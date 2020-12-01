@@ -1,3 +1,7 @@
+//Global var for users list
+usernameList = [];
+var list;
+
 //Check if New User
 function IsNewUser(username,list) {
     // console.log(list);
@@ -22,6 +26,10 @@ function CreateNewUser(username,list) {
     item.id = String(username) + "_name";
     item.innerHTML = String(username);
     list.appendChild(item);
+
+    /*//Add to local list
+    print(usernameList);*/
+
 }
 
 //Create new user
@@ -37,46 +45,41 @@ function SignIn() {
     username = document.getElementById('username').value;
     //console.log(username);
 
-    var list = document.getElementById('users');
+    // Establish list
+    list = document.getElementById('users');
 
-    ReadFile();
+    //console.log("LIST INIT: ", can);
 
     //New User
     if (IsNewUser(username,list)) {
+        usernameList.push(username);
         CreateNewUser(username,list);
-        CreateSignInItem(username,list);
-        //WriteToFile(username);
+        //CreateSignInItem(username,list);
     }
     else {
-        ID = String(username) + "_signins";
-        listItem = document.getElementById( ID );
-        listItem.innerHTML = parseInt(listItem.innerHTML) + 1;
+        console.log(username, "is already registered.")
+        //ID = String(username) + "_signins";
+        //listItem = document.getElementById( ID );
+        //listItem.innerHTML = parseInt(listItem.innerHTML) + 1;
     }
 
-    console.log("list: ", list.innerHTML); //innerHTML
+    console.log("list: ", list.innerHTML);
 
-    // console.log("Users: ", users);
+    //return false;
+    return true;
+}
 
-    /*('#button').click(function(){
-        $.ajax({
-            type: "POST",
-            url: "readWriteFileTest.php",
-            //write username to file
-            data: username,
-            success: function(msg){
-                alert(msg);
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-                alert("Some error occured");
-            }
-        });
-    });*/
+function DisplayList() {
+    // Establish list
+    list = document.getElementById('users');
+    ReadFile();
+    for (var i = 0; i < usernameList.length; i++) {
 
-    return false;
+        console.log(usernameList[i]);
+    }
 }
 
 function ReadFile() {
-    console.log("hi");
 
     //From: https://stackoverflow.com/questions/8137225/read-txt-file-via-client-javascript
     var xmlhttp;
@@ -93,5 +96,20 @@ function ReadFile() {
     xmlDoc=xmlhttp.responseText;
 
     //Got doc!
-    console.log(xmlDoc.toString());
+    //console.log(xmlDoc.toString());
+
+    //Split names at newline to generate username list
+    usernameList = xmlDoc.split("\n")
+
+    //Add those to HTML
+    //Go through each item in list and add to user list
+    for (var i = 0; i < usernameList.length; i++) {
+
+        //Get username from file-list
+        var username = usernameList[i];
+
+        //Add to list
+        CreateNewUser(username, list);
+        //CreateSignInItem(username, list);
+    }
 }
