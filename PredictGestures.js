@@ -656,21 +656,30 @@ function recordScore() {
 		return false;
 	}*/
 }
+var confirmWrite = "";
 function WriteScoreToFile() {
+
+	// confirmWrite += "sent";
 
 	//If username in list
 	//username
 
 	//https://stackoverflow.com/questions/37167755/writing-to-file-using-ajax
 	//send score to list
-	$.ajax({
-		type: 'POST',
-		url: "PredictGestures.php",
-		data: {f_score: score},
-		success: function(result) {
-			console.log('the data was successfully sent to the server');
-		}
-	})
+	$(document).ready(function() {
+		$.ajax({
+			method: "POST",
+			type: "POST",
+			url: "PredictGestures.php",
+			data: {f_score: score},
+			success: function(result) {
+				//confirmWrite += "sent";
+				//console.log('the data was successfully sent to the server');
+			}
+		});
+	});
+
+
 }
 
 // Handle Frame
@@ -943,6 +952,9 @@ function DisplayList() {
 	list = document.getElementById('users');
 
 	ReadFile();
+
+	//display text file status
+	text(confirmWrite, 100, 100);
 
 	//Draw current score
 	text("Current Score: " + score, scoreTextX, scoreTextY - (window.innerHeight/20));

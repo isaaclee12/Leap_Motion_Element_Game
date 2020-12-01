@@ -64,6 +64,8 @@
     print_r($_POST);
     print '</pre>';*/
 
+    $score = $_POST["f_score"];//filter_var(, FILTER_SANITIZE_INT);
+    print '<p> SCORE: ' . $score . '</p>';
 
 
     //process form when it is submitted
@@ -74,7 +76,6 @@
 
         //Sanitize data
         $username = filter_var($_POST["f_username"], FILTER_SANITIZE_STRING);
-        $score = $_POST["f_score"];//filter_var(, FILTER_SANITIZE_INT);
 
         //SERVER SIDE VALIDATION
         if ($username == "") {
@@ -149,7 +150,7 @@
                 }
             }*/
 
-            //If match was found, overwrite score
+            /*//If match was found, overwrite score
             if ($duplicateFound) {
                 //console_log("Duplicate Found, cannot write.");
 
@@ -173,7 +174,7 @@
                     print '<p>line added to file: ' . $line . '</p>';
                 }
 
-            }
+            }*/
 
             //No match found
             else {
@@ -192,7 +193,7 @@
                 else {
 
                     //Add newline and score
-                    $username = "\n" . $username . ":0";
+                    $username = "\n" . $username;
 
                     //write username to file
                     fwrite($fp, $username);
