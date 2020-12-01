@@ -18,12 +18,22 @@
     <body onload="DisplayList()">
         <main>
 <?php
+
+//console_log function https://stackify.com/how-to-log-to-console-in-php/
+function console_log($output, $with_script_tags = true) {
+    $js_code = 'console.log(' . json_encode($output, JSON_HEX_TAG) .
+        ');';
+    if ($with_script_tags) {
+        $js_code = '<script>' . $js_code . '</script>';
+    }
+    echo $js_code;
+}
+
 print '<p>POST Array:</p><pre>';
 print_r($_POST);
 print '</pre>';
 
-//print list
-/*print '<p>' . readfile("usernames.txt") . '</p>';*/
+
 
 //process form when it is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -46,36 +56,99 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     //print
-    print '<p>Username: ' . $username . '</p>';
+    //print '<p>Username: ' . $username . '</p>';
 
     //data to file
     //If data clean,
     if ($dataIsClean) {
-        //Add newline
-        $username = "\n" . $username;
+
+        //Establish var for duplicateFound
+        $duplicateFound = false;
+
+
 
         /*https://www.w3schools.com/php/func_filesystem_readfile.asp*/
-        //Read and match
+
+        //Read file
+        $usernameList = file_get_contents("usernames.txt");
+        //print_r($usernameList);
+        //print '<p></p>';
 
 
-        //Write to file
-        @ $fp = fopen("usernames.txt", 'a');
-        if (!$fp) {
-            echo '<p><strong>Cannot generate message file</strong></p></body></html>';
-            exit;
+
+        //Make into list
+        $usernameList = preg_split("/\s+/", $usernameList, -1, PREG_SPLIT_NO_EMPTY);
+        //print_r($usernameList);
+
+
+        //Search list
+        echo '<p>SEARCHING:</p>';
+        print_r($username);
+        echo '<p>IN LIST:</p>';
+        print_r($usernameList);
+
+        //If username in array
+        if (array_search($username, $usernameList) !== false) {
+            //Match found.
+            echo '<p>FOUND MATCH</p>';
+            $duplicateFound = true;
         }
+
+        // If not
         else {
-            //get username
-            $outputstring  = $username;
-            fwrite($fp, $outputstring);
-            print '<p>Username added to file: ' . $username . '</p>';
+            echo '<p>Match not found.</p>';
+            echo '<br><br>';
+        }
+
+        /*//Scan list for stuff
+        for ($i = 0; $i < count($usernameList); $i++) {
+
+            print_r($usernameList[$i]);
+            print_r($username);
+            echo '<br>';
+
+            //If match found
+            if ($usernameList[$i] === $username) {
+                echo '<p>FOUND MATCH</p>';
+                $duplicateFound = true;
+            }
+        }*/
+
+        //If match was found, don't write
+        if ($duplicateFound) {
+            console_log("Duplicate Found, cannot write.");
+        }
+
+        //No match found
+        else {
+            //Write to file
+
+            //Attempt to open file
+            @ $fp = fopen("usernames.txt", 'a');
+
+            //On fail
+            if (!$fp) {
+                echo '<p><strong>Cannot generate message file</strong></p></body></html>';
+                exit;
+            }
+
+            //On success
+            else {
+
+                //Add newline
+                $username = "\n" . $username;
+
+                //write username to file
+                fwrite($fp, $username);
+                print '<p>Username added to file: ' . $username . '</p>';
+            }
         }
     }
 }
 ?>
             <!--PREVENT REFRESH ON SUBMIT-->
             <!--https://stackoverflow.com/questions/23507608/form-submission-without-page-refresh-->
-            <script type="text/javascript">
+            <!--<script type="text/javascript">
                 $(document).ready(function () {
                     $('#myform').on('submit', function(e) {
                         e.preventDefault();
@@ -92,7 +165,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         });
                     });
                 });
-            </script>
+            </script>-->
 
             <form id="myform" method="POST" action="<?php echo $_SERVER['PHP_SELF'];?>">
                 Enter Userame: <input id="username" type="text" name="f_username" placeholder="name">
