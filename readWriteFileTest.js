@@ -57,6 +57,21 @@ function SignIn() {
 
     // console.log("Users: ", users);
 
+    /*('#button').click(function(){
+        $.ajax({
+            type: "POST",
+            url: "readWriteFileTest.php",
+            //write username to file
+            data: username,
+            success: function(msg){
+                alert(msg);
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                alert("Some error occured");
+            }
+        });
+    });*/
+
     return false;
 }
 
@@ -79,25 +94,4 @@ function ReadFile() {
 
     //Got doc!
     console.log(xmlDoc.toString());
-}
-
-function WriteToFile(item) {
-
-
-    // fh = fopen(getScriptPath("usernames.txt"), 0); // Open the file for reading
-    //
-    // // If the file has been successfully opened
-    // if(fh != -1) {
-    //     var str = "Some text goes here...";
-    //     fwrite(fh, str); // Write the string to a file
-    //     fclose(fh); // Close the file
-    // }
-
-    /*console.log(item);
-    var fs = require('fs');
-
-    fs.appendFile('usernames.txt', item, function (err) {
-        if (err) throw err;
-        console.log('Saved!');
-    });*/
 }
