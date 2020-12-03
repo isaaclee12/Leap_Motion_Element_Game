@@ -1,5 +1,5 @@
-Isaac: 100
+Becky: 180
 Isaac: 120
 Isaac: 300
-Mom: 210
+Isaac: 410
 Sid: 790
