@@ -103,63 +103,46 @@
         if ($dataIsClean) {
 
             //Acquire score from .js
-            $total_score = $_COOKIE["total_score"]; //filter_var($_POST["f_score"], FILTER_SANITIZE_STRING);
-            print '<p> SCORE: ' . $total_score . '</p>';
+            $totalScore = $_COOKIE["total_score"]; //filter_var($_POST["f_score"], FILTER_SANITIZE_STRING);
+            print '<p> SCORE: ' . $totalScore . '</p>';
 
             /*
              * READ HIGH SCORES FILE FOR DATA
              * */
             //Read file
-            $high_scores_list = file_get_contents("highscores.txt");
+            $highScoresList = file_get_contents("highscores.txt");
 
             //Split list into items by space
-            $high_scores_list = preg_split("/\s+/", $high_scores_list, -1, PREG_SPLIT_NO_EMPTY);
+            $highScoresList = preg_split("/\s+/", $highScoresList, -1, PREG_SPLIT_NO_EMPTY);
 
             //Init new array and index
-            $high_scores_dict = array();
+            $highScoresDict = array();
             //$index = 0;
+            $usernameIndexInScoresList = 0;
 
             //For all items in that array of Names/Scores
-            for ($i = 0; $i < count($high_scores_list); $i += 2) {
+            for ($i = 0; $i < count($highScoresList); $i += 2) {
                 // Even index = Name
-                $key = $high_scores_list[$i];
+                $key = $highScoresList[$i];
                 // Odd index = Score
-                $value = $high_scores_list[$i + 1];
+                $value = $highScoresList[$i + 1];
                 //Add key/value pair to dict
-                $high_scores_dict[$key] = $value;
+                $highScoresDict[$key] = $value;
+
+                //If the username entered happens to match a username in the list, save the index where you found it
+                if ($username == $key) {
+                    $usernameIndexInScoresList = $i/2; //Divided by 2 because i = 2 at row index 1, etc
+                }
             }
-
-
-            /*
-             * ADD SCORE TO FILE
-             * */
-            //Attempt to open file
-            @ $high_scores_file = fopen("highscores.txt", 'a');
-
-            //On fail
-            if (!$high_scores_file) {
-                echo '<p><strong>Cannot generate message file</strong></p></body></html>';
-                exit;
-            }
-
-            //On success
-            else {
-
-                //Add newline and score
-                $total_score = "\n" . $username . ":" . $total_score;
-
-            //write username to file
-            fwrite($high_scores_file, $total_score);
-            print '<p>Highscore added to file: ' . $total_score . '</p>';
-            }
+            print_r($highScoresDict);
 
 
             /*
              * SEE IF USERNAME ALREADY REGISTERED
              * */
+
             //Establish var for duplicateFound
             //$duplicateFound = false;
-
             /*https://www.w3schools.com/php/func_filesystem_readfile.asp*/
 
             //Read file
@@ -168,20 +151,59 @@
 
             //Make into list
             $usernameList = preg_split("/\s+/", $usernameList, -1, PREG_SPLIT_NO_EMPTY);
-            //print_r($usernameList);
-            //"\n" .
-            //$usernameWithScore = $username . ":0";
 
             //If username already registered
             if (array_search($username, $usernameList) !== false) {
                 echo '<p>Username already entered.</p>';
-                //Write to file
+
+
+                /*
+                 * UPDATE SCORE - FIND SCORE IN FILE
+                 * */
+
+                /*
+                 * Search scores list for username entered
+                 * */
+
+                /*
+                 * ADD SCORE TO FILE
+                 * */
+                //Open the file
+                $lines = file( "highscores.txt" , FILE_IGNORE_NEW_LINES );
+
+                //Add username/score pair at that username's line's index
+                $lines[$usernameIndexInScoresList] = $username . ": " . $totalScore;
+
+                //Put those lines back
+                file_put_contents( "highscores.txt" , implode( "\n", $lines ) );
 
                 //Attempt to open file
-                @ $username_file = fopen("usernames.txt", 'a');
+                /*@ $highScoresFile = fopen("highscores.txt", 'a');
 
                 //On fail
-                if (!$username_file) {
+                if (!$highScoresFile) {
+                    echo '<p><strong>Cannot generate message file</strong></p></body></html>';
+                    exit;
+                }
+
+                //On success
+                else {
+                    //Add newline and score, write to file, print confirmation msg
+                    $totalScore = "\n" . $username . ": " . $totalScore;
+                    fwrite($highScoresFile, $totalScore);
+                    print '<p>Highscore added to file: ' . $totalScore . '</p>';
+                }*/
+            }
+
+            //If username not yet registered
+            else {
+                /*
+                 * ADD USERNAME TO FILE
+                 * */
+                @ $usernameFile = fopen("usernames.txt", 'a');
+
+                //On fail
+                if (!$usernameFile) {
                     echo '<p><strong>Cannot generate message file</strong></p></body></html>';
                     exit;
                 }
@@ -192,15 +214,29 @@
                     $username = "\n" . $username;
 
                     //write username to file
-                    fwrite($username_file, $username);
+                    fwrite($usernameFile, $username);
                     print '<p>Username added to file: ' . $username . '</p>';
                 }
-            }
 
-            //If not in array
-            else {
-                echo '<p>Adding new user:' . $username . '</p>';
-                echo '<br><br>';
+                /*
+                 * ADD SCORE TO FILE
+                 * */
+                //Attempt to open file
+                @ $highScoresFile = fopen("highscores.txt", 'a');
+
+                //On fail
+                if (!$highScoresFile) {
+                    echo '<p><strong>Cannot generate message file</strong></p></body></html>';
+                    exit;
+                }
+
+                //On success
+                else {
+                    //Add newline and score, write to file, print confirmation msg
+                    $totalScore = "\n" . $username . ": " . $totalScore;
+                    fwrite($highScoresFile, $totalScore);
+                    print '<p>Highscore added to file: ' . $totalScore . '</p>';
+                }
             }
         }
     }
@@ -227,7 +263,7 @@
     </script>
 
     <form id="myform" method="POST" action="<?php echo $_SERVER['PHP_SELF'];?>">
-        Enter Username: <input id="username" type="text" name="f_username" placeholder="name">
+        Enter Username to Save High Score: <input id="username" type="text" name="f_username" placeholder="name">
         <input onclick="return SignIn();" type="submit">
         <!--<button onclick="return SignIn();" id="button" type="submit">Sign in</button>-->
     </form>
