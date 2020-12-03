@@ -50,7 +50,9 @@
 <main>
     <script>WriteScoreToFile()</script>
 <!--    <input type="hidden" id="score" value="--><?php //echo $score ?><!--" />-->
-    <ul id="score"></ul>
+<!--    <ul id="score"></ul>-->
+<!--    <div id="score"></div>-->
+    <form id="score" method="POST" action="<?php echo $_SERVER['PHP_SELF'];?>"></form>
 
     <?php
 
@@ -68,13 +70,15 @@
     print_r($_POST);
     print '</pre>';*/
 
-    $score = filter_var($_POST["f_score"], FILTER_SANITIZE_STRING);
-    print '<p> SCORE: ' . $score . '</p>';
+
 
 
     //process form when it is submitted
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
+        /*
+         * GET USERNAME FROM FORM
+         * */
         //VARS
         $dataIsClean = true;
 
@@ -92,12 +96,69 @@
             $dataIsClean = false;
         }
 
-        //data to file
+        /*
+         * ADD USERNAME TO FILE
+         * */
         //If data clean,
         if ($dataIsClean) {
 
+            //Acquire score from .js
+            $total_score = $_COOKIE["total_score"]; //filter_var($_POST["f_score"], FILTER_SANITIZE_STRING);
+            print '<p> SCORE: ' . $total_score . '</p>';
+
+            /*
+             * READ HIGH SCORES FILE FOR DATA
+             * */
+            //Read file
+            $high_scores_list = file_get_contents("highscores.txt");
+
+            //Split list into items by space
+            $high_scores_list = preg_split("/\s+/", $high_scores_list, -1, PREG_SPLIT_NO_EMPTY);
+
+            //Init new array and index
+            $high_scores_dict = array();
+            //$index = 0;
+
+            //For all items in that array of Names/Scores
+            for ($i = 0; $i < count($high_scores_list); $i += 2) {
+                // Even index = Name
+                $key = $high_scores_list[$i];
+                // Odd index = Score
+                $value = $high_scores_list[$i + 1];
+                //Add key/value pair to dict
+                $high_scores_dict[$key] = $value;
+            }
+
+
+            /*
+             * ADD SCORE TO FILE
+             * */
+            //Attempt to open file
+            @ $high_scores_file = fopen("highscores.txt", 'a');
+
+            //On fail
+            if (!$high_scores_file) {
+                echo '<p><strong>Cannot generate message file</strong></p></body></html>';
+                exit;
+            }
+
+            //On success
+            else {
+
+                //Add newline and score
+                $total_score = "\n" . $username . ":" . $total_score;
+
+            //write username to file
+            fwrite($high_scores_file, $total_score);
+            print '<p>Highscore added to file: ' . $total_score . '</p>';
+            }
+
+
+            /*
+             * SEE IF USERNAME ALREADY REGISTERED
+             * */
             //Establish var for duplicateFound
-            $duplicateFound = false;
+            //$duplicateFound = false;
 
             /*https://www.w3schools.com/php/func_filesystem_readfile.asp*/
 
@@ -108,52 +169,38 @@
             //Make into list
             $usernameList = preg_split("/\s+/", $usernameList, -1, PREG_SPLIT_NO_EMPTY);
             //print_r($usernameList);
-
-
             //"\n" .
             //$usernameWithScore = $username . ":0";
 
-            //If username in array
+            //If username already registered
             if (array_search($username, $usernameList) !== false) {
-                //Match found.
                 echo '<p>Username already entered.</p>';
-                $duplicateFound = true;
-            }
-
-            //If not in array
-            else {
-                echo '<p>Adding new user:' . $username . '</p>';
-                echo '<br><br>';
-            }
-
-            //If match was found, overwrite score
-            if ($duplicateFound) {
-                //console_log("Duplicate Found, cannot write.");
-            }
-
-            //No match found
-            else {
                 //Write to file
 
                 //Attempt to open file
-                @ $fp = fopen("usernames.txt", 'a');
+                @ $username_file = fopen("usernames.txt", 'a');
 
                 //On fail
-                if (!$fp) {
+                if (!$username_file) {
                     echo '<p><strong>Cannot generate message file</strong></p></body></html>';
                     exit;
                 }
 
                 //On success
                 else {
-
                     //Add newline and score
                     $username = "\n" . $username;
 
                     //write username to file
-                    fwrite($fp, $username);
+                    fwrite($username_file, $username);
                     print '<p>Username added to file: ' . $username . '</p>';
                 }
+            }
+
+            //If not in array
+            else {
+                echo '<p>Adding new user:' . $username . '</p>';
+                echo '<br><br>';
             }
         }
     }

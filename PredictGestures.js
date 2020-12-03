@@ -662,13 +662,54 @@ function recordScore() {
 var confirmWrite = "";
 function WriteScoreToFile() {
 
-	//Get div item
-	var list = document.getElementById('score');
-	var item = document.createElement('li');
-	item.id = String(score) + "_score";
+	//Make a cookie
+	$(document).ready(function () {
+		// var expires;
+		/*if (days) {
+			var date = new Date();
+			date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+			expires = "; expires=" + date.toGMTString();
+		}*/
+		/*else {
+			expires = "";
+		}*/
+
+		document.cookie = "total_score" + "=" + escape(totalScore) + "; path=/"; //+ expires
+		//console.log("Cookie:", document.cookie);
+	});
+
+
+	/*//Get div item from .php
+	var div = document.getElementById('score');
+
+	//If there are existing child items in the div
+	if (document.getElementById('score').childElementCount !== 0) {
+		//Remove all existing list score items
+		var removeItem = document.getElementById('list_score')
+		div.removeChild(removeItem);
+	}
+
+
+	//Make a new <div> object
+	var item = document.createElement('input');
+
+	// Give it an ID (for removal later)
+	item.id = "list_score"; //String(score) + "
+
+	//Post method to gain PHP access, hopefully
+	item.method = "POST";
+
+	//Have name be field for PHP to catch in post
+	item.name = "f_score";
+
+	//Add score as string as content
 	item.innerHTML = String(score);
-	list.appendChild(item);
-	console.log("Scores:", list);
+
+	//Add <input> to div
+	div.appendChild(item);
+
+	//Display for Debug
+	console.log("Scores:", div);*/
 
 	// confirmWrite += "sent";
 
