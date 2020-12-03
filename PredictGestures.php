@@ -132,7 +132,7 @@
 
                 //If the username entered happens to match a username in the list, save the index where you found it
                 if ($username == $key) {
-                    $usernameIndexInScoresList++; //Iterate //Divided by 2 because i = 2 at row index 1, etc
+                    $usernameIndexInScoresList = ($i/2); //Divided by 2 because i = 2 at row index 1, etc
                     //Record score for that username
                     $lastScore = $value;
                     //print_r($lastScore);
@@ -156,21 +156,12 @@
             //Make into list
             $usernameList = preg_split("/\s+/", $usernameList, -1, PREG_SPLIT_NO_EMPTY);
 
-            //If username already registered
-            if (array_search($username, $usernameList) !== false) {
-                //echo '<p>Hello, ' . $username . '!</p>';
-
-
+            /*
+             * IF USERNAME IS ALREADY REGISTERED IN FILE - UPDATE SCORE IF BEATEN, DO NOT ADD AS NEW USER
+             * */
+            if (array_search($username, $usernameList) !== false) { //"Search for username in list-> false"
                 /*
-                 * UPDATE SCORE - FIND SCORE IN FILE
-                 * */
-
-                /*
-                 * Search scores list for username entered
-                 * */
-
-                /*
-                 * ADD SCORE TO FILE IF HIGH SCORE GREATER THAN PREVIOUS
+                 * UPDATE SCORE IF HIGH SCORE BEATEN
                  * */
                 if ($totalScore > $lastScore) {
                     //Open the file
@@ -184,36 +175,22 @@
                     //Put those lines back
                     file_put_contents( "highscores.txt" , implode("\n",$lines));
 
-                    print '<p>New high score for ' . $username . ': ' . $totalScore . '!</p>';
+                    print '<p>High score updated for ' . $username . ': ' . $totalScore . '!</p>';
                 }
-
+                /*
+                 * IF HIGH SCORE NOT BEATEN, DO NOT UPDATE FILE
+                 * */
                 else {
-                    print '<p>High score not beaten: ' . $lastScore . '</p>';
+                    print '<p>Did not update high score: ' . $totalScore . ' did not beat ' . $username .'\'s best score of: ' . $lastScore . '!</p>';
                 }
-
-
-                //Attempt to open file
-                /*@ $highScoresFile = fopen("highscores.txt", 'a');
-
-                //On fail
-                if (!$highScoresFile) {
-                    echo '<p><strong>Cannot generate message file</strong></p></body></html>';
-                    exit;
-                }
-
-                //On success
-                else {
-                    //Add newline and score, write to file, print confirmation msg
-                    $totalScore = "\n" . $username . ": " . $totalScore;
-                    fwrite($highScoresFile, $totalScore);
-                    print '<p>Highscore added to file: ' . $totalScore . '</p>';
-                }*/
             }
 
-            //If username not yet registered
+            /*
+             * IF USERNAME IS ALREADY NEW - ADD AS NEW USER TO BOTH FILES
+             * */
             else {
                 /*
-                 * ADD USERNAME TO FILE
+                 * ADD USERNAME TO USERNAMES FILE (Still need this for ease of acquiring username list
                  * */
                 @ $usernameFile = fopen("usernames.txt", 'a');
 
@@ -230,11 +207,11 @@
 
                     //write username to file
                     fwrite($usernameFile, $username);
-                    print '<p>Username added to file: ' . $username . '</p>';
+                    print '<p>New username added to file: ' . $username . '</p>';
                 }
 
                 /*
-                 * ADD SCORE TO FILE
+                 * ADD NEW USERNAME/SCORE PAIR TO FILE
                  * */
                 //Attempt to open file
                 @ $highScoresFile = fopen("highscores.txt", 'a');
@@ -250,7 +227,7 @@
                     //Add score, write to file, print confirmation msg
                     $totalScore = $username . ": " . $totalScore;
                     fwrite($highScoresFile, $totalScore);
-                    print '<p>Highscore added to file: ' . $totalScore . '</p>';
+                    print '<p>New highscore added to file: ' . $totalScore . '</p>';
                 }
             }
         }
@@ -278,7 +255,7 @@
     </script>-->
 
     <form id="myform" method="POST" action="<?php echo $_SERVER['PHP_SELF'];?>">
-        Enter Username to Save High Score: <input id="username" type="text" name="f_username" placeholder="name">
+        Enter Username to Save High Score (This will reset your current score!!!): <input id="username" type="text" name="f_username" placeholder="name">
         <input onclick="return SignIn();" type="submit">
         <!--<button onclick="return SignIn();" id="button" type="submit">Sign in</button>-->
     </form>

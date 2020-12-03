@@ -360,28 +360,28 @@ function GotResults(err, result) {
 	// 1 Hand:
 	if (handCount === 1) {
 
-		//AIR = Single Palm
-		if (parseInt(result.label) === 0) {
-			userElement = "AIR";
+		//FIRE = Single Fist
+		if (parseInt(result.label) === 1) {
+			userElement = "FIRE";
 		}
 
-		//FIRE = Single Fist
-		else if (parseInt(result.label) === 1) {
-			userElement = "FIRE";
+		//AIR = Single Palm
+		else if (parseInt(result.label) === 0) {
+			userElement = "AIR";
 		}
 	}
 
 	// 2 Hands:
 	else if (handCount === 2) {
 
-		//WATER = Two Palms
-		if (parseInt(result.label) === 0) {
-			userElement = "WATER";
+		//EARTH = Two Fists
+		if (parseInt(result.label) === 1) {
+			userElement = "EARTH";
 		}
 
-		//EARTH = Two Fists
-		else { //For some reason, removing this makes the element detection smoother -> (parseInt(result.label) === 1)
-			userElement = "EARTH";
+		//WATER = Two Palms
+		else { //For some reason, removing this makes the element detection smoother -> (parseInt(result.label) === 0)
+			userElement = "WATER";
 		}
 	}
 
@@ -664,78 +664,9 @@ function WriteScoreToFile() {
 
 	//Make a cookie
 	$(document).ready(function () {
-		// var expires;
-		/*if (days) {
-			var date = new Date();
-			date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-			expires = "; expires=" + date.toGMTString();
-		}*/
-		/*else {
-			expires = "";
-		}*/
-
 		document.cookie = "total_score" + "=" + escape(totalScore) + "; path=/"; //+ expires
 		//console.log("Cookie:", document.cookie);
 	});
-
-
-	/*//Get div item from .php
-	var div = document.getElementById('score');
-
-	//If there are existing child items in the div
-	if (document.getElementById('score').childElementCount !== 0) {
-		//Remove all existing list score items
-		var removeItem = document.getElementById('list_score')
-		div.removeChild(removeItem);
-	}
-
-
-	//Make a new <div> object
-	var item = document.createElement('input');
-
-	// Give it an ID (for removal later)
-	item.id = "list_score"; //String(score) + "
-
-	//Post method to gain PHP access, hopefully
-	item.method = "POST";
-
-	//Have name be field for PHP to catch in post
-	item.name = "f_score";
-
-	//Add score as string as content
-	item.innerHTML = String(score);
-
-	//Add <input> to div
-	div.appendChild(item);
-
-	//Display for Debug
-	console.log("Scores:", div);*/
-
-	// confirmWrite += "sent";
-
-	//If username in list
-	//username
-
-	//https://stackoverflow.com/questions/37167755/writing-to-file-using-ajax
-	//send score to list
-	$(document).ready(function() {
-
-		//send to score var
-		$("#score").focusout(function() {
-			$.ajax({
-				//method: "POST",
-				type: "POST",
-				url: "PredictGestures.php",
-				data: {f_score: String(score)},
-				dataType: "html",
-				success: function(result) {
-					// confirmWrite += "sent";
-					//console.log('the data was successfully sent to the server');
-				}
-			});
-		});
-	});
-
 }
 
 // Handle Frame
@@ -958,17 +889,7 @@ function CreateNewUser(username,list) {
 	item.id = String(username) + "_name";
 	item.innerHTML = String(username);
 	list.appendChild(item);
-
-	/*//Add to local list
-    print(usernameList);*/
-
 }
-/*function CreateSignInItem(username,list) {
-	var item = document.createElement('li');
-	item.id = String(username) + "_signins";
-	item.innerHTML = 1;
-	list.appendChild(item);
-}*/
 
 //Establish global username var
 var username;
@@ -1000,7 +921,8 @@ function SignIn() {
 
 var scoreTextX = window.innerWidth/20;
 var scoreTextY = window.innerHeight/2;
-var scoreTextIncrementY = 0;
+var scoreTextIncrementYDefault = (3*window.innerHeight)/20; // Three 20ths of window height.
+var scoreTextIncrementY = scoreTextIncrementYDefault;
 function DisplayList() {
 	// Establish list
 	list = document.getElementById('users');
@@ -1015,6 +937,9 @@ function DisplayList() {
 	text("Total Score: " + totalScore, scoreTextX, scoreTextY - (window.innerHeight/20));
 	// console.log("Total Score:", totalScore);
 
+	//Render High Scores Label
+	text("High Scores:", scoreTextX, scoreTextY);
+
 	//Draw list in order in bottom left
 	for (var i = 0; i < usernameList.length; i++) {
 
@@ -1026,7 +951,7 @@ function DisplayList() {
 	}
 
 	//Reset increment
-	scoreTextIncrementY = 0;
+	scoreTextIncrementY = scoreTextIncrementYDefault;
 }
 
 var haveReadFile = false;
@@ -1043,7 +968,7 @@ function ReadFile() {
 		{// code for IE6, IE5
 			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
 		}
-		xmlhttp.open("GET","usernames.txt",false);
+		xmlhttp.open("GET","highscores.txt",false);
 		xmlhttp.send();
 		xmlDoc=xmlhttp.responseText;
 

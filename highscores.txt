@@ -1,5 +1,4 @@
-Becky: 180
-Isaac: 120
-Isaac: 300
-Isaac: 410
-Sid: 790
+Isaac: 2270
+Austin: 200
+Becky: 880
+Sid: 420
