@@ -380,7 +380,7 @@ function GotResults(err, result) {
 		}
 
 		//EARTH = Two Fists
-		else if (parseInt(result.label) === 1) {
+		else { //For some reason, removing this makes the element detection smoother -> (parseInt(result.label) === 1)
 			userElement = "EARTH";
 		}
 	}
@@ -668,6 +668,7 @@ function WriteScoreToFile() {
 	item.id = String(score) + "_score";
 	item.innerHTML = String(score);
 	list.appendChild(item);
+	console.log("Scores:", list);
 
 	// confirmWrite += "sent";
 
@@ -971,7 +972,7 @@ function DisplayList() {
 	//Draw current score
 	text("Latest Score: " + score, scoreTextX, scoreTextY - (2 * window.innerHeight/20));
 	text("Total Score: " + totalScore, scoreTextX, scoreTextY - (window.innerHeight/20));
-	console.log("Total Score:", totalScore);
+	// console.log("Total Score:", totalScore);
 
 	//Draw list in order in bottom left
 	for (var i = 0; i < usernameList.length; i++) {

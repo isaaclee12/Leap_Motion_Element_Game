@@ -49,7 +49,8 @@
 <body onload="DisplayList()">
 <main>
     <script>WriteScoreToFile()</script>
-    <input type="hidden" id="score" value="<?php echo $score ?>" />
+<!--    <input type="hidden" id="score" value="--><?php //echo $score ?><!--" />-->
+    <ul id="score"></ul>
 
     <?php
 
