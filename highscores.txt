@@ -1,2 +1,5 @@
-Isaac 400
-asdf:100
+Isaac: 100
+Isaac: 120
+Isaac: 300
+Mom: 210
+Sid: 790

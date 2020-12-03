@@ -113,12 +113,13 @@
             $highScoresList = file_get_contents("highscores.txt");
 
             //Split list into items by space
-            $highScoresList = preg_split("/\s+/", $highScoresList, -1, PREG_SPLIT_NO_EMPTY);
+            $highScoresList = preg_split("/[:\s]+/", $highScoresList, -1, PREG_SPLIT_NO_EMPTY);
 
             //Init new array and index
             $highScoresDict = array();
             //$index = 0;
             $usernameIndexInScoresList = 0;
+            $lastScore = "";
 
             //For all items in that array of Names/Scores
             for ($i = 0; $i < count($highScoresList); $i += 2) {
@@ -131,10 +132,13 @@
 
                 //If the username entered happens to match a username in the list, save the index where you found it
                 if ($username == $key) {
-                    $usernameIndexInScoresList = $i/2; //Divided by 2 because i = 2 at row index 1, etc
+                    $usernameIndexInScoresList++; //Iterate //Divided by 2 because i = 2 at row index 1, etc
+                    //Record score for that username
+                    $lastScore = $value;
+                    //print_r($lastScore);
                 }
             }
-            print_r($highScoresDict);
+            //print_r($highScoresDict);
 
 
             /*
@@ -154,7 +158,7 @@
 
             //If username already registered
             if (array_search($username, $usernameList) !== false) {
-                echo '<p>Username already entered.</p>';
+                //echo '<p>Hello, ' . $username . '!</p>';
 
 
                 /*
@@ -166,16 +170,27 @@
                  * */
 
                 /*
-                 * ADD SCORE TO FILE
+                 * ADD SCORE TO FILE IF HIGH SCORE GREATER THAN PREVIOUS
                  * */
-                //Open the file
-                $lines = file( "highscores.txt" , FILE_IGNORE_NEW_LINES );
+                if ($totalScore > $lastScore) {
+                    //Open the file
+                    $lines = file( "highscores.txt" , FILE_IGNORE_NEW_LINES );
 
-                //Add username/score pair at that username's line's index
-                $lines[$usernameIndexInScoresList] = $username . ": " . $totalScore;
+                    //Add username/score pair at that username's line's index
+                    $lines[$usernameIndexInScoresList] = $username . ": " . $totalScore;
+                    /*print '<p>Lines in array:</p>';
+                    print_r($lines);*/
 
-                //Put those lines back
-                file_put_contents( "highscores.txt" , implode( "\n", $lines ) );
+                    //Put those lines back
+                    file_put_contents( "highscores.txt" , implode("\n",$lines));
+
+                    print '<p>New high score for ' . $username . ': ' . $totalScore . '!</p>';
+                }
+
+                else {
+                    print '<p>High score not beaten: ' . $lastScore . '</p>';
+                }
+
 
                 //Attempt to open file
                 /*@ $highScoresFile = fopen("highscores.txt", 'a');
@@ -232,8 +247,8 @@
 
                 //On success
                 else {
-                    //Add newline and score, write to file, print confirmation msg
-                    $totalScore = "\n" . $username . ": " . $totalScore;
+                    //Add score, write to file, print confirmation msg
+                    $totalScore = $username . ": " . $totalScore;
                     fwrite($highScoresFile, $totalScore);
                     print '<p>Highscore added to file: ' . $totalScore . '</p>';
                 }
@@ -243,7 +258,7 @@
     ?>
     <!--PREVENT REFRESH ON SUBMIT-->
     <!--https://stackoverflow.com/questions/23507608/form-submission-without-page-refresh-->
-    <script type="text/javascript">
+    <!--<script type="text/javascript">
         $(document).ready(function () {
             $('#myform').on('submit', function(e) {
                 e.preventDefault();
@@ -260,7 +275,7 @@
                 });
             });
         });
-    </script>
+    </script>-->
 
     <form id="myform" method="POST" action="<?php echo $_SERVER['PHP_SELF'];?>">
         Enter Username to Save High Score: <input id="username" type="text" name="f_username" placeholder="name">
