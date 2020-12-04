@@ -33,19 +33,6 @@ var timeLimit = 5;
 //Elements/Enemies
 var elements = ["Air", "Water", "Earth", "Fire", "Lightning", "Wood"];
 
-var userElementTextX = window.innerWidth/10;
-var userElementTextY = window.innerHeight/10;
-
-var enemyAlive = false;
-var enemyID = -1;
-var lastEnemyID = -1;
-var enemyElement = "";
-
-var enemyElementTextX = window.innerWidth * .90;
-var enemyElementTextY = window.innerHeight/10;
-
-//Win counter
-var wins = 0;
 
 // Num hands
 var handCount = 0;
@@ -549,10 +536,28 @@ function generateNewEnemy() {
 	// Keep track of last enemy id
 	lastEnemyID = enemyID;
 }
-//var ableToRecordScore = false;
+
+var userElementTextX = window.innerWidth/10;
+var userElementTextY = window.innerHeight/10;
+
+//Enemy Flags/vars
+var enemyAlive = false;
+var enemyID = -1;
+var lastEnemyID = -1;
+var enemyElement = "";
+var enemyWeakness = "";
+
+//Enemy Text Coords
+var enemyElementTextX = window.innerWidth * .90;
+var enemyElementTextY = window.innerHeight/10;
+
+//Win counter
+var wins = 0;
+
+//Flags for handling enemy dead/alive/printing/generating states
 var firstRun = true;
 var showingDeadEnemy = true;
-// Handle Enemy
+
 function HandleEnemy() {
 
 	if (!enemyAlive) {
@@ -575,14 +580,6 @@ function HandleEnemy() {
 
 			//Show Image of Dead Enemy before respawn
 			showDeadEnemy();
-
-			/*//Allow score recording only if able to
-			if (!ableToRecordScore) {
-
-				//Reset bool
-				ableToRecordScore = false;
-			}*/
-			//console.log()
 		}
 
 		//Done showing dead enemy, after first run
@@ -594,9 +591,6 @@ function HandleEnemy() {
 			//new enemy
 			generateNewEnemy()
 
-				/*//Enum element to string
-				showEnemy();*/
-
 			//if dead, increase counter
 			wins += 1;
 
@@ -607,16 +601,6 @@ function HandleEnemy() {
 			}
 		}
 	}
-
-	/*//If enemy is dead and loading completed
-	if (!enemyAlive) {
-
-
-
-
-
-
-	}*/
 
 	//Enemy alive
 	else {
@@ -632,12 +616,13 @@ function HandleEnemy() {
 		}
 	}
 
-	//Always print element
-	text("Enemy Element:", enemyElementTextX * (7/9), enemyElementTextY)
+	//Print enemy element and weakness
+	text("Enemy Element: " + enemyElement, enemyElementTextX * (7/9), enemyElementTextY);
+	text("Enemy Weakness: " + enemyWeakness, enemyElementTextX * (7/9), 2 * enemyElementTextY);
 
 	//Print stats
 	var winCounter = "Wins: " + wins;
-	text(winCounter, enemyElementTextX * (7/9), enemyElementTextY * 2)
+	text(winCounter, enemyElementTextX * (7/9), enemyElementTextY * 3);
 
 }
 var enemyWidth = window.innerWidth/4;
@@ -646,23 +631,27 @@ function showEnemy() {
 
 	switch (enemyID) {
 		case 0:
-			text("Air", enemyElementTextX, enemyElementTextY);
+			// text("Air", enemyElementTextX, enemyElementTextY);
 			enemyElement = "AIR";
+			enemyWeakness = "FIRE";
 			image(airEnemy, enemyWidth, enemyHeight);
 			break;
 		case 1:
-			text("Water", enemyElementTextX, enemyElementTextY);
+			// text("Water", enemyElementTextX, enemyElementTextY);
 			enemyElement = "WATER";
+			enemyWeakness = "AIR";
 			image(waterEnemy, enemyWidth, enemyHeight);
 			break;
 		case 2:
-			text("Earth", enemyElementTextX, enemyElementTextY);
+			// text("Earth", enemyElementTextX, enemyElementTextY);
 			enemyElement = "EARTH";
+			enemyWeakness = "WATER";
 			image(earthEnemy, enemyWidth, enemyHeight);
 			break;
 		case 3:
-			text("Fire", enemyElementTextX, enemyElementTextY);
+			// text("Fire", enemyElementTextX, enemyElementTextY);
 			enemyElement = "FIRE";
+			enemyWeakness = "EARTH";
 			image(fireEnemy, enemyWidth, enemyHeight);
 			break;
 		default:
@@ -754,23 +743,23 @@ function showDeadEnemy() {
 function showDeadEnemyImage() {
 	switch (enemyElement) {
 		case "AIR":
-			text("Air", enemyElementTextX, enemyElementTextY);
+			//text("Air", enemyElementTextX, enemyElementTextY);
 			image(airEnemyDead, enemyWidth, enemyHeight);
 			break;
 		case "WATER":
-			text("Water", enemyElementTextX, enemyElementTextY);
+			//text("Water", enemyElementTextX, enemyElementTextY);
 			image(waterEnemyDead, enemyWidth, enemyHeight);
 			break;
 		case "EARTH":
-			text("Earth", enemyElementTextX, enemyElementTextY);
+			//text("Earth", enemyElementTextX, enemyElementTextY);
 			image(earthEnemyDead, enemyWidth, enemyHeight);
 			break;
 		case "FIRE":
-			text("Fire", enemyElementTextX, enemyElementTextY);
+			//text("Fire", enemyElementTextX, enemyElementTextY);
 			image(fireEnemyDead, enemyWidth, enemyHeight);
 			break;
 		default:
-			text("Error: Dead Enemy Element Invalid", enemyElementTextX, enemyElementTextY);
+			//text("Error: Dead Enemy Element Invalid", enemyElementTextX, enemyElementTextY);
 			break;
 	}
 }
