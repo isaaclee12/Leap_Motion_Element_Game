@@ -2,6 +2,19 @@ var img;
 
 function setup() {
     createCanvas(window.innerWidth,window.innerHeight);
+    //Enemy Images
+    airEnemy = loadImage('https://i.imgur.com/ooIKejL.png');
+    waterEnemy = loadImage('https://i.imgur.com/pwuic8V.png');
+    earthEnemy = loadImage('https://i.imgur.com/2KhZpg4.png');
+    fireEnemy = loadImage('https://i.imgur.com/s4WHBRr.png');
+
+    //Enemy Dead Images
+    airEnemyDead = loadImage('https://i.imgur.com/zAMqpod.png');
+    waterEnemyDead = loadImage('https://i.imgur.com/r9Fxk5e.png');
+    earthEnemyDead = loadImage('https://i.imgur.com/Md2hZLV.png');
+    fireEnemyDead = loadImage('https://i.imgur.com/jvgKCbs.png');
+
+    /* Old Images.
     img = loadImage('https://i.imgur.com/2DUZesl.png');
     arrowLeft = loadImage('https://i.imgur.com/CcOkvDT.png');
     arrowRight = loadImage('https://i.imgur.com/4y7A2Mp.png');
@@ -41,5 +54,5 @@ function setup() {
     altSignSixHOTDOG = loadImage('https://i.imgur.com/8BBRCmV.png');
     altSignSevenHOTDOG = loadImage('https://i.imgur.com/j7XhmA4.png ');
     altSignEightHOTDOG = loadImage('https://i.imgur.com/iP5eWEY.png');
-    altSignNineHOTDOG = loadImage('https://i.imgur.com/8U6Ieqh.png');
+    altSignNineHOTDOG = loadImage('https://i.imgur.com/8U6Ieqh.png');*/
 }

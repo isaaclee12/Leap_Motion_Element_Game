@@ -520,7 +520,58 @@ function ScaleElement() {
 		}
 	}*/
 }
+var timeSinceLastEnemyDeath = new Date();
+function showDeadEnemy() {
 
+	//Get current time
+	var currentTime = new Date();
+
+	//Calculate time since enemy died
+	timeChangeInMilliseconds = currentTime - timeSinceLastEnemyDeath;
+	var enemyDeathTimer = timeChangeInMilliseconds/1000;
+
+	//While 1 second hasn't passed...
+	while (enemyDeathTimer < 1) {
+		//Keep updating the time
+		currentTime = new Date();
+		timeChangeInMilliseconds = currentTime - timeSinceLastEnemyDeath;
+		enemyDeathTimer = timeChangeInMilliseconds/1000;
+		image()
+
+		//Show image of the dead enemy
+		showDeadEnemyImage();
+	}
+
+	//After one second, reset the var.
+	timeSinceLastEnemyDeath = new Date();
+
+
+
+	timeSinceLastEnemyDeath
+}
+function showDeadEnemyImage() {
+	switch (enemyElement) {
+		case "AIR":
+			text("Air", enemyElementTextX, enemyElementTextY);
+			image(airEnemy, enemyWidth, enemyHeight);
+			break;
+		case "WATER":
+			text("Water", enemyElementTextX, enemyElementTextY);
+			image(waterEnemy, enemyWidth, enemyHeight);
+			break;
+		case "EARTH":
+			text("Earth", enemyElementTextX, enemyElementTextY);
+			image(earthEnemy, enemyWidth, enemyHeight);
+			break;
+		case "FIRE":
+			text("Fire", enemyElementTextX, enemyElementTextY);
+			image(fireEnemy, enemyWidth, enemyHeight);
+			break;
+		default:
+			text("Error: Dead Enemy Element Invalid", enemyElementTextX, enemyElementTextY);
+			break;
+	}
+}
 // Handle Enemy
 function HandleEnemy() {
 
@@ -529,6 +580,9 @@ function HandleEnemy() {
 
 		//Record Score
 		recordScore();
+
+		//Show Image of Dead Enemy before respawn
+		showDeadEnemy();
 
 		//Generate new enemy w/ new element:
 		//Random num 0 to 3
@@ -566,24 +620,30 @@ function HandleEnemy() {
 	text(winCounter, enemyElementTextX * (7/9), enemyElementTextY * 2)
 
 }
+var enemyWidth = window.innerWidth/4;
+var enemyHeight = window.innerHeight/6;
 function SelectAndPrintEnemyElement() {
 
 	switch (enemyID) {
 		case 0:
 			text("Air", enemyElementTextX, enemyElementTextY);
 			enemyElement = "AIR";
+			image(airEnemy, enemyWidth, enemyHeight);
 			break;
 		case 1:
 			text("Water", enemyElementTextX, enemyElementTextY);
 			enemyElement = "WATER";
+			image(waterEnemy, enemyWidth, enemyHeight);
 			break;
 		case 2:
 			text("Earth", enemyElementTextX, enemyElementTextY);
 			enemyElement = "EARTH";
+			image(earthEnemy, enemyWidth, enemyHeight);
 			break;
 		case 3:
 			text("Fire", enemyElementTextX, enemyElementTextY);
 			enemyElement = "FIRE";
+			image(fireEnemy, enemyWidth, enemyHeight);
 			break;
 		default:
 			text("Error: Enemy ID Out Of Range", enemyElementTextX, enemyElementTextY);
