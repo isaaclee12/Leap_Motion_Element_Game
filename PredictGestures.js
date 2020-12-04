@@ -385,8 +385,13 @@ function GotResults(err, result) {
 		}
 	}
 
+	// No Hands:
+	else {
+		userElement = "NONE";
+	}
+
 	// print label:
-	//console.log("PREDICTION: ", currentPrediction);
+	console.log("PREDICTION: ", userElement, "ENEMY: ", enemyElement);
 
 	// Return it
 	return(parseInt(result.label));
@@ -489,6 +494,16 @@ function HandleElement(bone, handCount, fingerIndex, boneType, canvasX1, canvasY
 			}
 		}
 
+		else if (userElement === "NONE") {
+			//Color = Black
+			stroke('rgb(0, 0, 0)');
+			fill('rgb(0, 0, 0)');
+
+			//Write text
+			strokeWeight(1);
+			text('None', userElementTextX, userElementTextY);
+		}
+
 	}
 	catch(err) {
 
@@ -536,7 +551,6 @@ function showDeadEnemy() {
 		currentTime = new Date();
 		timeChangeInMilliseconds = currentTime - timeSinceLastEnemyDeath;
 		enemyDeathTimer = timeChangeInMilliseconds/1000;
-		image()
 
 		//Show image of the dead enemy
 		showDeadEnemyImage();
@@ -698,8 +712,11 @@ function recordScore() {
 		score = 10;
 	}
 
-	//Add to total
-	totalScore += score;
+	//Add to total (If statement prevents score from iterating on initialization,
+	// i.e. it waits until training is done.
+	if (trainingCompleted) {
+		totalScore += score;
+	}
 
 	//Write score to file
 	WriteScoreToFile();

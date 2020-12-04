@@ -5,8 +5,8 @@ function setup() {
     //Enemy Images
     airEnemy = loadImage('https://i.imgur.com/ooIKejL.png');
     waterEnemy = loadImage('https://i.imgur.com/pwuic8V.png');
-    earthEnemy = loadImage('https://i.imgur.com/2KhZpg4.png');
-    fireEnemy = loadImage('https://i.imgur.com/s4WHBRr.png');
+    earthEnemy = loadImage('https://i.imgur.com/s4WHBRr.png');
+    fireEnemy = loadImage('https://i.imgur.com/2KhZpg4.png');
 
     //Enemy Dead Images
     airEnemyDead = loadImage('https://i.imgur.com/zAMqpod.png');
