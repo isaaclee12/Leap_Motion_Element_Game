@@ -45,7 +45,7 @@ var enemyElementTextX = window.innerWidth * .90;
 var enemyElementTextY = window.innerHeight/10;
 
 //Win counter
-var wins = -1;
+var wins = 0;
 
 // Num hands
 var handCount = 0;
@@ -391,7 +391,7 @@ function GotResults(err, result) {
 	}
 
 	// print label:
-	console.log("PREDICTION: ", userElement, "ENEMY: ", enemyElement);
+	// console.log("PREDICTION: ", userElement, "ENEMY: ", enemyElement);
 
 	// Return it
 	return(parseInt(result.label));
@@ -535,99 +535,98 @@ function ScaleElement() {
 		}
 	}*/
 }
-var timeSinceLastEnemyDeath = new Date();
-function showDeadEnemy() {
 
-	//Get current time
-	var currentTime = new Date();
+function generateNewEnemy() {
+	//Generate new enemy w/ new element:
+	//Random num 0 to 3
+	enemyID = Math.floor(Math.random() * 4);
 
-	//Calculate time since enemy died
-	timeChangeInMilliseconds = currentTime - timeSinceLastEnemyDeath;
-	var enemyDeathTimer = timeChangeInMilliseconds/1000;
-
-	//While 1 second hasn't passed...
-	while (enemyDeathTimer < 1) {
-		//Keep updating the time
-		currentTime = new Date();
-		timeChangeInMilliseconds = currentTime - timeSinceLastEnemyDeath;
-		enemyDeathTimer = timeChangeInMilliseconds/1000;
-
-		//Show image of the dead enemy
-		showDeadEnemyImage();
+	//Validation: Make sure element is different this time
+	while(enemyID === lastEnemyID) {
+		enemyID = Math.floor(Math.random() * 4);
 	}
 
-	//After one second, reset the var.
-	timeSinceLastEnemyDeath = new Date();
-
-
-
-	timeSinceLastEnemyDeath
+	// Keep track of last enemy id
+	lastEnemyID = enemyID;
 }
-function showDeadEnemyImage() {
-	switch (enemyElement) {
-		case "AIR":
-			text("Air", enemyElementTextX, enemyElementTextY);
-			image(airEnemy, enemyWidth, enemyHeight);
-			break;
-		case "WATER":
-			text("Water", enemyElementTextX, enemyElementTextY);
-			image(waterEnemy, enemyWidth, enemyHeight);
-			break;
-		case "EARTH":
-			text("Earth", enemyElementTextX, enemyElementTextY);
-			image(earthEnemy, enemyWidth, enemyHeight);
-			break;
-		case "FIRE":
-			text("Fire", enemyElementTextX, enemyElementTextY);
-			image(fireEnemy, enemyWidth, enemyHeight);
-			break;
-		default:
-			text("Error: Dead Enemy Element Invalid", enemyElementTextX, enemyElementTextY);
-			break;
-	}
-}
+//var ableToRecordScore = false;
+var firstRun = true;
+var showingDeadEnemy = true;
 // Handle Enemy
 function HandleEnemy() {
 
-	//If enemy is dead
 	if (!enemyAlive) {
+		console.log("Enemy Dead");
 
-		//Record Score
-		recordScore();
-
-		//Show Image of Dead Enemy before respawn
-		showDeadEnemy();
-
-		//Generate new enemy w/ new element:
-		//Random num 0 to 3
-		enemyID = Math.floor(Math.random() * 4);
-
-		//Validation: Make sure element is different this time
-		while(enemyID === lastEnemyID) {
-			enemyID = Math.floor(Math.random() * 4);
+		if (firstRun) {
+			//Spawn 1st enemy
+			generateNewEnemy();
+			//Break from first loop
+			firstRun = false;
+			//Init enemy, break loop
+			enemyAlive = true;
+			showEnemy();
+			console.log("First Enemy: ", enemyElement);
 		}
 
-		//Enum element to string
-		SelectAndPrintEnemyElement();
+		//Show dead enemy if any run after first
+		else if (showingDeadEnemy && !firstRun) {
+			console.log("Showing dead enemy");
+			//Show Image of Dead Enemy before respawn
+			showDeadEnemy();
 
-		//Summon enemy!
-		enemyAlive = true;
+			/*//Allow score recording only if able to
+			if (!ableToRecordScore) {
 
-		//if dead, increase counter
-		wins += 1;
+				//Reset bool
+				ableToRecordScore = false;
+			}*/
+			console.log()
+		}
 
-		// Keep track of last enemy id
-		lastEnemyID = enemyID;
+		//Done showing dead enemy, after first run
+		else if (!showingDeadEnemy && !firstRun) {
+			console.log("Spawning new enemy");
+			//Record Score
+			recordScore();
+
+			//new enemy
+			generateNewEnemy()
+
+			//Enum element to string
+			showEnemy();
+
+			//if dead, increase counter
+			wins += 1;
+		}
 	}
 
+	/*//If enemy is dead and loading completed
+	if (!enemyAlive) {
+
+
+
+
+
+
+	}*/
+
+	//Enemy alive
 	else {
+		//Show the enemy
+		showEnemy();
+
 		//Check if enemy alive
 		enemyAlive = CheckIfEnemyAlive();
+
+		//if they just died, switch flag for showing dead enemy
+		if (!enemyAlive) {
+			showingDeadEnemy = true;
+		}
 	}
 
-	//Always print element @ .80 screen width
+	//Always print element
 	text("Enemy Element:", enemyElementTextX * (7/9), enemyElementTextY)
-	SelectAndPrintEnemyElement();
 
 	//Print stats
 	var winCounter = "Wins: " + wins;
@@ -636,7 +635,7 @@ function HandleEnemy() {
 }
 var enemyWidth = window.innerWidth/4;
 var enemyHeight = window.innerHeight/6;
-function SelectAndPrintEnemyElement() {
+function showEnemy() {
 
 	switch (enemyID) {
 		case 0:
@@ -692,6 +691,72 @@ function CheckIfEnemyAlive() {
 
 	//No weakness = no change
 	return true;
+}
+
+// Handle Enemy Death
+var timeSinceLastEnemyDeath = new Date();
+function showDeadEnemy() {
+
+	//Get current time
+	var currentTime = new Date();
+
+	//Calculate time since enemy died
+	var timeChangeInMilliseconds = currentTime - timeSinceLastEnemyDeath;
+	var enemyDeathTimer = timeChangeInMilliseconds/1000;
+
+	//While 1 second hasn't passed...
+	if (enemyDeathTimer < 1) {
+		//Keep updating the time
+		currentTime = new Date();
+		timeChangeInMilliseconds = currentTime - timeSinceLastEnemyDeath;
+		enemyDeathTimer = timeChangeInMilliseconds/1000;
+
+		console.log("Showing Dead Enemy Image");
+
+		//Show image of the dead enemy
+		showDeadEnemyImage();
+	}
+
+	else {
+		console.log("NEW ENEMY TIME");
+		//After one second, reset the vars.
+		timeSinceLastEnemyDeath = new Date();
+
+		//Break from loop
+		showingDeadEnemy = false;
+
+		//Set score recording flag to true
+		//ableToRecordScore = true;
+
+		//Wait until training done on init to summon new enemy
+		//Summon enemy!
+		if (trainingCompleted) {
+			enemyAlive = true;
+		}
+	}
+}
+function showDeadEnemyImage() {
+	switch (enemyElement) {
+		case "AIR":
+			text("Air", enemyElementTextX, enemyElementTextY);
+			image(airEnemyDead, enemyWidth, enemyHeight);
+			break;
+		case "WATER":
+			text("Water", enemyElementTextX, enemyElementTextY);
+			image(waterEnemyDead, enemyWidth, enemyHeight);
+			break;
+		case "EARTH":
+			text("Earth", enemyElementTextX, enemyElementTextY);
+			image(earthEnemyDead, enemyWidth, enemyHeight);
+			break;
+		case "FIRE":
+			text("Fire", enemyElementTextX, enemyElementTextY);
+			image(fireEnemyDead, enemyWidth, enemyHeight);
+			break;
+		default:
+			text("Error: Dead Enemy Element Invalid", enemyElementTextX, enemyElementTextY);
+			break;
+	}
 }
 
 //var timeSinceLastChange = new Date();
