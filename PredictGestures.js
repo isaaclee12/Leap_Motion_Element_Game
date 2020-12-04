@@ -566,12 +566,13 @@ function HandleEnemy() {
 			//Init enemy, break loop
 			enemyAlive = true;
 			showEnemy();
-			console.log("First Enemy: ", enemyElement);
+			//console.log("First Enemy: ", enemyElement);
 		}
 
 		//Show dead enemy if any run after first
 		else if (showingDeadEnemy && !firstRun) {
-			console.log("Showing dead enemy");
+			//console.log("Showing dead enemy");
+
 			//Show Image of Dead Enemy before respawn
 			showDeadEnemy();
 
@@ -581,11 +582,11 @@ function HandleEnemy() {
 				//Reset bool
 				ableToRecordScore = false;
 			}*/
-			console.log()
+			//console.log()
 		}
 
 		//Done showing dead enemy, after first run
-		else if (!showingDeadEnemy && !firstRun) {
+		else if (!showingDeadEnemy) { //if (!showingDeadEnemy && !firstRun)
 			console.log("Spawning new enemy");
 			//Record Score
 			recordScore();
@@ -593,11 +594,17 @@ function HandleEnemy() {
 			//new enemy
 			generateNewEnemy()
 
-			//Enum element to string
-			showEnemy();
+				/*//Enum element to string
+				showEnemy();*/
 
 			//if dead, increase counter
 			wins += 1;
+
+			//Wait until training done on init to summon new enemy
+			//Summon enemy!
+			if (trainingCompleted) {
+				enemyAlive = true;
+			}
 		}
 	}
 
@@ -695,21 +702,34 @@ function CheckIfEnemyAlive() {
 
 // Handle Enemy Death
 var timeSinceLastEnemyDeath = new Date();
+var gotTimeSinceLastEnemyDeath = false;
+var timeToShowEnemyDeathImage = 1;
 function showDeadEnemy() {
 
 	//Get current time
 	var currentTime = new Date();
+
+	//Get timestamp of when enemy died
+	if (!gotTimeSinceLastEnemyDeath) {
+
+		//On first frame only!
+		timeSinceLastEnemyDeath = new Date();
+
+		//Set bool to true
+		gotTimeSinceLastEnemyDeath = true;
+	}
+
 
 	//Calculate time since enemy died
 	var timeChangeInMilliseconds = currentTime - timeSinceLastEnemyDeath;
 	var enemyDeathTimer = timeChangeInMilliseconds/1000;
 
 	//While 1 second hasn't passed...
-	if (enemyDeathTimer < 1) {
+	if (enemyDeathTimer < timeToShowEnemyDeathImage) {
 		//Keep updating the time
-		currentTime = new Date();
+		/*currentTime = new Date();
 		timeChangeInMilliseconds = currentTime - timeSinceLastEnemyDeath;
-		enemyDeathTimer = timeChangeInMilliseconds/1000;
+		enemyDeathTimer = timeChangeInMilliseconds/1000;*/
 
 		console.log("Showing Dead Enemy Image");
 
@@ -718,21 +738,17 @@ function showDeadEnemy() {
 	}
 
 	else {
-		console.log("NEW ENEMY TIME");
+		console.log("No Longer Showing Dead Enemy Image");
 		//After one second, reset the vars.
-		timeSinceLastEnemyDeath = new Date();
+		//timeSinceLastEnemyDeath = new Date();
+		gotTimeSinceLastEnemyDeath = false;
+
 
 		//Break from loop
 		showingDeadEnemy = false;
 
 		//Set score recording flag to true
 		//ableToRecordScore = true;
-
-		//Wait until training done on init to summon new enemy
-		//Summon enemy!
-		if (trainingCompleted) {
-			enemyAlive = true;
-		}
 	}
 }
 function showDeadEnemyImage() {
