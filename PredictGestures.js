@@ -675,30 +675,50 @@ function ScaleElement() {
 	}*/
 }
 
-var userElementTextX = window.innerWidth/10;
-var userElementTextY = window.innerHeight/10;
+//Flags for Handling HP
+var userHPMax = 1500;
+var userHP = userHPMax;
+var userIsAlive = true;
+var userIsBeingAttacked = false;
+var addedHP = 0;
+function HandleHP() {
+	//When enemy is alive... (after first run)
+	if (userIsBeingAttacked && enemyAlive) {
+		//Decrease HP
+		userHP--;
+	}
 
-//Enemy Flags/vars
-var enemyAlive = false;
-var enemyID = -1;
-var lastEnemyID = -1;
-var enemyElement = "";
-var enemyWeakness = "";
+	//Gain HP when enemy defeated
+	if (!firstRun && !enemyAlive) {
+		text("HP Gained: +" + addedHP, window.innerWidth/2, 2 * window.innerHeight/20);
+	}
 
-//Enemy Text Coords
-var enemyElementTextX = window.innerWidth * .90;
-var enemyElementTextY = window.innerHeight/10;
+	//Print HP
+	text("HP Left: " + userHP + "/" + userHPMax, window.innerWidth/2, window.innerHeight/20);
 
-//Flags for handling enemy dead/alive/printing/generating states
-var firstRun = true;
-var showingDeadEnemy = true;
+	//If HP = 0, DIE
+	if (userHP <= 0) {
+		//Keep HP at 0...
+		userHP = 0;
+		userIsAlive = false;
+	}
 
+	//Cap HP Gains at 1500
+	if (userHP > 1500) {
+		userHP = 1500;
+	}
+}
+function addHP() {
+	addedHP = score;
+	userHP += addedHP;
+}
 //Flags for handling difficulty
 var difficulty = 0;
 var winCounter = 0;
 var showingEnemyWeakness = true;
 var showingEnemyElement = true;
 var enemyDeathIsSlow = true;
+var showingTutorial = true;
 var youWin = false;
 function HandleDifficulty() {
 	//After 10 wins...
@@ -708,7 +728,7 @@ function HandleDifficulty() {
 
 		//Reset win counter
 		winCounter = 0;
-		console.log("Difficulty:", difficulty);
+		console.log("Level:", difficulty);
 	}
 
 	//New Conditions based on difficulty level:
@@ -718,6 +738,7 @@ function HandleDifficulty() {
 			showingEnemyWeakness = true;
 			showingEnemyElement = true;
 			enemyDeathIsSlow = true;
+			showingTutorial = true;
 			break;
 
 		//1: Don't show enemy weakness
@@ -731,11 +752,12 @@ function HandleDifficulty() {
 			showingEnemyElement = false;
 			break;
 
-		//3: Enemy Re-spawns Quickly
+		//3: Enemy Re-spawns Quickly, Remove Tutorial
 		case 3:
 			showingEnemyWeakness = false;
 			showingEnemyElement = false;
 			enemyDeathIsSlow = false;
+			showingTutorial = false;
 			break;
 
 		//4: Reset
@@ -753,6 +775,24 @@ function HandleDifficulty() {
 			console.log("Error: Difficulty not in range [0,3]")
 	}
 }
+
+var userElementTextX = window.innerWidth/10;
+var userElementTextY = window.innerHeight/10;
+
+//Enemy Flags/vars
+var enemyAlive = false;
+var enemyID = -1;
+var lastEnemyID = -1;
+var enemyElement = "";
+var enemyWeakness = "";
+
+//Enemy Text Coords
+var enemyElementTextX = window.innerWidth * .90;
+var enemyElementTextY = window.innerHeight/10;
+
+//Flags for handling enemy dead/alive/printing/generating states
+var firstRun = true;
+var showingDeadEnemy = true;
 
 function HandleEnemy() {
 
@@ -826,7 +866,9 @@ function HandleEnemy() {
 	//Diff 0
 	if (showingEnemyWeakness) {
 		text("Enemy Weakness: " + enemyWeakness, enemyElementTextX * (7/9), enemyElementTextY);
-		image(elementSquare, .65 * window.innerWidth, .4 * window.innerHeight, .7 * window.innerWidth, .5 * window.innerHeight);
+		var squareWidth = window.innerWidth/6
+		var squareHeight = window.innerHeight/6
+		image(elementSquare, 4.1 * squareWidth, 2.7 * squareHeight); //, 5.1 * squareWidth, 3.7 * squareHeight
 	}
 
 	//Diff 0 thru 1
@@ -835,7 +877,7 @@ function HandleEnemy() {
 	}
 
 	//Print stats
-	text("Wins: " + winCounter, enemyElementTextX * (7/9), enemyElementTextY * 3);
+	text("Wins: " + winCounter + "/10", enemyElementTextX * (7/9), enemyElementTextY * 3);
 	text("Difficulty: " + difficulty, enemyElementTextX * (7/9), enemyElementTextY * 4);
 }
 
@@ -974,6 +1016,9 @@ function showDeadEnemy() {
 		//Break from loop
 		showingDeadEnemy = false;
 
+		//Add HP on last frame
+		addHP();
+
 		//Set score recording flag to true
 		//ableToRecordScore = true;
 	}
@@ -1004,6 +1049,12 @@ function showDeadEnemyImage() {
 
 function ShowWinState() {
 	text("YOU WIN!", window.innerWidth/2, window.innerHeight/2);
+	text("Final Score: " + totalScore, window.innerWidth/2, window.innerHeight * .6);
+	text("Save score by entering name in top left!", window.innerWidth/2, window.innerHeight * .8);
+}
+
+function ShowLoseState() {
+	text("YOU DIED.", window.innerWidth/2, window.innerHeight/2);
 	text("Final Score: " + totalScore, window.innerWidth/2, window.innerHeight * .6);
 	text("Save score by entering name in top left!", window.innerWidth/2, window.innerHeight * .8);
 }
@@ -1086,18 +1137,27 @@ function DetermineState(frame) {
 var tutorialWidth = window.innerWidth/5;
 var tutorialHeight = window.innerHeight/6;
 function drawTutorial() {
-	image(tutorialImage, tutorialWidth, tutorialHeight, 2.5 * tutorialWidth, 4 * tutorialHeight);
+	image(tutorialImage, tutorialWidth, tutorialHeight, 2.25 * tutorialWidth, 4 * tutorialHeight);
 }
 
 // No Hands
 function HandleState0(frame) {
-	drawTutorial();
+	if (showingTutorial) {
+		drawTutorial();
+	}
+
+	else {
+		text("I hope you remember the hand gestures! >:)", tutorialWidth, tutorialHeight);
+	}
 
 	// text("EGG", window.innerWidth * .75, window.innerHeight/2);
 	console.log("STATE 0");
 }
 // 1 Hand
 function HandleState1(frame) {
+	//Start being attacked as soon as first hands enter frame
+	userIsBeingAttacked = true;
+
 	// Draw hands
 	HandleFrame(frame);
 	test();
@@ -1171,7 +1231,7 @@ function SignIn() {
 
 var scoreTextX = window.innerWidth/20;
 var scoreTextY = window.innerHeight/2;
-var scoreTextIncrementYDefault = (3*window.innerHeight)/20; // Three 20ths of window height.
+var scoreTextIncrementYDefault = (2*window.innerHeight)/20; // Three 20ths of window height.
 var scoreTextIncrementY = scoreTextIncrementYDefault;
 function DisplayList() {
 	// Establish list
@@ -1264,28 +1324,29 @@ Leap.loop(controllerOptions, function(frame) {
 			ShowWinState();
 		}
 
-		//Have not won yet; Print enemies
-		else {
+		//Have not won yet; Still Alive, Run Game
+		else if (userIsAlive) {
+			HandleHP();
 			HandleEnemy();
+
+			DetermineState(frame);
+
+			if (programState === 0) {
+				HandleState0(frame);
+			}
+
+			else if (programState === 1) {
+				HandleState1(frame);
+			}
+
+			else if (programState === 2) {
+				HandleState2(frame);
+			}
 		}
 
-		DetermineState(frame);
-
-		// console.log(programState);
-		//tutorialWidth, tutorialHeight, 3 * tutorialWidth, 3 * tutorialHeight
-
-		// image(fireEnemyDead, tutorialWidth, tutorialHeight, 3 * tutorialWidth, 3 * tutorialHeight);
-
-		if (programState === 0) {
-			HandleState0(frame);
-		}
-
-		else if (programState === 1) {
-			HandleState1(frame);
-		}
-
-		else if (programState === 2) {
-			HandleState2(frame);
+		//User died, fail
+		else if (!userIsAlive) {
+			ShowLoseState();
 		}
 
 	} catch {

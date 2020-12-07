@@ -1,6 +1,5 @@
-Isaac: 16750
+Isaac: 2910
 Austin: 400
-Becky: 880
 Sid: 420
-Sonah: 3770
+Sonah: 1010
 Andrew: 1670

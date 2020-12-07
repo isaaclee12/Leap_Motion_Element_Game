@@ -16,7 +16,7 @@ function setup() {
 
     //Tutorial Image, Weakness Square
     tutorialImage = loadImage('https://i.imgur.com/rF5n6kz.png');
-    elementSquare = loadImage('https://i.imgur.com/Lum7dz9.png');
+    elementSquare = loadImage('https://i.imgur.com/IMbTwCt.png');
 
     /* Old Images.
     img = loadImage('https://i.imgur.com/2DUZesl.png');
