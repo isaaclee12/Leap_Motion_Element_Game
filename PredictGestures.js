@@ -303,6 +303,158 @@ function train() {
 
 	trainingCompleted = true;
 }
+
+// Handle Frame
+function HandleFrame(frame) {
+
+	// Num hands
+	handCount = frame.hands.length;
+
+	// data on hands
+	hand1 = frame.hands[0];
+	hand2 = frame.hands[1];
+
+	// Interaction Box
+	var interactionBox = frame.interactionBox;
+
+	HandleHand(hand1, handCount, interactionBox);
+	HandleHand(hand2, handCount, interactionBox);
+}
+function HandleHand(hand, handCount, interactionBox) {
+
+	// fingers
+	try {
+		var fingers = hand.fingers; // fingers in first hand
+
+		// each finger TAKEN FROM:
+		// https:// developer-archive.leapmotion.com/documentation/javascript/api/Leap.Hand.html#Hand.fingers[], much easier for loop to work with.
+
+		// From distal to metacarpal,
+		for (var phalangeNum = 4; phalangeNum >= 0; phalangeNum--) {
+
+			// From thumb to pinky
+			for (var fingerNum = 0; fingerNum <= 4; fingerNum++) {
+				HandleBone(fingers[fingerNum].bones[phalangeNum], handCount, fingerNum, interactionBox);
+			}
+		}
+
+	} catch(err) {
+		// console.log("Fingers failed");
+	}
+
+}
+function HandleBone(bone, handCount, fingerIndex, interactionBox) {
+
+	try {
+
+		// Normalize point w/ interaction box
+		var normalizedPrevJoint = interactionBox.normalizePoint(bone.prevJoint, true);
+		// console.log("Prev:",normalizedPrevJoint.toString());
+
+		var normalizedNextJoint = interactionBox.normalizePoint(bone.nextJoint, true);
+		// console.log("Next:",normalizedNextJoint.toString());
+
+		// Save coordinates to vars
+		var x1 = normalizedPrevJoint[0];
+		var y1 = normalizedPrevJoint[1];
+		var z1 = normalizedPrevJoint[2];
+		var x2 = normalizedNextJoint[0];
+		var y2 = normalizedNextJoint[1];
+		var z2 = normalizedNextJoint[2];
+
+		// Record to arrays
+		row = fingerIndex;
+		col = bone.type;
+		framesOfData.set(row, col, 0, x1);
+		framesOfData.set(row, col, 1, y1);
+		framesOfData.set(row, col, 2, z1);
+		framesOfData.set(row, col, 3, x2);
+		framesOfData.set(row, col, 4, y2);
+		framesOfData.set(row, col, 5, z2);
+
+		// **MAKE SURE TRANSFORM HAPPENS AFTER DATA IS RECORDED**
+		// Scale new points to canvas
+		var canvasX1 = window.innerWidth * x1;
+		var canvasY1 = window.innerHeight * (1 - y1);
+		var canvasX2 = window.innerWidth * x2;
+		var canvasY2 = window.innerHeight * (1 - y2);
+
+		// Z min and max
+		var rawZmax = 200;
+		var rawZmin = -200
+
+		// Stroke thickness
+		var strokeWeightMax = 50;
+		var zStrokeWeight = ((bone.prevJoint[2] - rawZmin) * strokeWeightMax) / (rawZmax - rawZmin);
+
+		// Bone segment number
+		var boneType = bone.type;
+
+		/*var red = (1 - predictionAccuracyAverage) * 255;
+		var blue = predictionAccuracyAverage * 255;
+		// console.log("RED: ", red, " GREEN: ", green);
+
+		// Hands always grey, regardless of count
+		if (boneType === 0) {
+			stroke(red,  blue, 100);
+		} else if (boneType === 1) {
+			stroke(red,  blue, 75);
+		} else if (boneType === 2) {
+			stroke(red, blue,  50);
+		} else if (boneType === 3) {
+			stroke(red, blue,  25);
+		}*/
+
+		/*// GREEN IF 1 HAND
+		if (handCount === 1) {
+
+			if (boneType === 0) {
+				stroke('rgb(179, 255, 224)');
+			} else if (boneType === 1) {
+				stroke('rgb(77, 255, 184)');
+			} else if (boneType === 2) {
+				stroke('rgb(0, 230, 138)');
+			} else if (boneType === 3) {
+				stroke('rgb(0, 153, 92)');
+			}
+
+			// RED IF 2 HANDS
+		} else if (handCount === 2) {
+
+			if (boneType === 0) {
+				stroke('rgb(255, 214, 204)');
+			} else if (boneType === 1) {
+				stroke('rgb(255, 133, 102)');
+			} else if (boneType === 2) {
+				stroke('rgb(255, 71, 26)');
+			} else if (boneType === 3) {
+				stroke('rgb(179, 36, 0)');
+			}
+
+		}*/
+
+		//Set hand colors
+		if (boneType === 0) {
+			stroke('rgb(179, 255, 224)');
+		} else if (boneType === 1) {
+			stroke('rgb(77, 255, 184)');
+		} else if (boneType === 2) {
+			stroke('rgb(0, 230, 138)');
+		} else if (boneType === 3) {
+			stroke('rgb(0, 153, 92)');
+		}
+
+		strokeWeight(zStrokeWeight/5);
+
+		line(canvasX1,canvasY1,canvasX2,canvasY2);
+
+		HandleElement(bone, handCount, fingerIndex, boneType, canvasX1, canvasY1);
+	}
+	catch(err) {
+		// console.log("Drawing line failed");
+	}
+}
+
 function test() {
 
 	// Extract ith 3D Tensor
@@ -547,11 +699,16 @@ var winCounter = 0;
 var showingEnemyWeakness = true;
 var showingEnemyElement = true;
 var enemyDeathIsSlow = true;
+var youWin = false;
 function HandleDifficulty() {
 	//After 10 wins...
 	if (winCounter >= 10) {
 		//Increase difficulty by one
 		difficulty++;
+
+		//Reset win counter
+		winCounter = 0;
+		console.log("Difficulty:", difficulty);
 	}
 
 	//New Conditions based on difficulty level:
@@ -583,11 +740,12 @@ function HandleDifficulty() {
 
 		//4: Reset
 		case 4:
-			console.log("You win! Resetting game.")
-			difficulty = 0;
+			// console.log("You win! Resetting game.")
+			youWin = true;
+			/*difficulty = 0;
 			showingEnemyWeakness = true;
 			showingEnemyElement = true;
-			enemyDeathIsSlow = true;
+			enemyDeathIsSlow = true;*/
 			break;
 
 		//Error:
@@ -609,12 +767,12 @@ function HandleEnemy() {
 			//Init enemy, break loop
 			enemyAlive = true;
 			showEnemy();
-			//console.log("First Enemy: ", enemyElement);
+			console.log("First Enemy: ", enemyElement);
 		}
 
 		//Show dead enemy if any run after first
 		else if (showingDeadEnemy && !firstRun) {
-			//console.log("Showing dead enemy");
+			console.log("Showing dead enemy");
 
 			//Show Image of Dead Enemy before respawn
 			showDeadEnemy();
@@ -637,7 +795,7 @@ function HandleEnemy() {
 			generateNewEnemy()
 
 			//if dead, increase counter
-			wins += 1;
+			// wins += 1;
 
 			//Wait until training done on init to summon new enemy
 			//Summon enemy!
@@ -649,6 +807,8 @@ function HandleEnemy() {
 
 	//Enemy alive
 	else {
+		// console.log("Showing enemy");
+
 		//Show the enemy
 		showEnemy();
 
@@ -665,17 +825,17 @@ function HandleEnemy() {
 
 	//Diff 0
 	if (showingEnemyWeakness) {
-		text("Enemy Weakness: " + enemyWeakness, enemyElementTextX * (7/9), 2 * enemyElementTextY);
+		text("Enemy Weakness: " + enemyWeakness, enemyElementTextX * (7/9), enemyElementTextY);
 	}
 
 	//Diff 0 thru 1
 	if (showingEnemyElement) {
-		text("Enemy Element: " + enemyElement, enemyElementTextX * (7/9), enemyElementTextY);
+		text("Enemy Element: " + enemyElement, enemyElementTextX * (7/9), enemyElementTextY * 2);
 	}
 
 	//Print stats
-	// var winCounter = "Wins: " + wins;
-	// text(winCounter, enemyElementTextX * (7/9), enemyElementTextY * 3);
+	text("Wins: " + winCounter, enemyElementTextX * (7/9), enemyElementTextY * 3);
+	text("Difficulty: " + difficulty, enemyElementTextX * (7/9), enemyElementTextY * 4);
 }
 
 function generateNewEnemy() {
@@ -762,6 +922,16 @@ var gotTimeSinceLastEnemyDeath = false;
 var timeToShowEnemyDeathImage = 1;
 function showDeadEnemy() {
 
+	//Difficulty 0 thru 2
+	if (enemyDeathIsSlow) {
+		timeToShowEnemyDeathImage = 1;
+	}
+
+	//Difficulty 3
+	else {
+		timeToShowEnemyDeathImage = 0.25;
+	}
+
 	//Get current time
 	var currentTime = new Date();
 
@@ -831,6 +1001,12 @@ function showDeadEnemyImage() {
 	}
 }
 
+function ShowWinState() {
+	text("YOU WIN!", window.innerWidth/2, window.innerHeight/2);
+	text("Final Score: " + totalScore, window.innerWidth/2, window.innerHeight * .6);
+	text("Save score by entering name in top left!", window.innerWidth/2, window.innerHeight * .8);
+}
+
 //var timeSinceLastChange = new Date();
 var timeChangeInSeconds = 0;
 var score = 0;
@@ -881,157 +1057,6 @@ function WriteScoreToFile() {
 		document.cookie = "total_score" + "=" + escape(totalScore) + "; path=/"; //+ expires
 		//console.log("Cookie:", document.cookie);
 	});
-}
-
-// Handle Frame
-function HandleFrame(frame) {
-
-	// Num hands
-	handCount = frame.hands.length;
-
-	// data on hands
-	hand1 = frame.hands[0];
-	hand2 = frame.hands[1];
-
-	// Interaction Box
-	var interactionBox = frame.interactionBox;
-
-	HandleHand(hand1, handCount, interactionBox);
-	HandleHand(hand2, handCount, interactionBox);
-}
-function HandleHand(hand, handCount, interactionBox) {
-
-	// fingers
-	try {
-		var fingers = hand.fingers; // fingers in first hand
-
-		// each finger TAKEN FROM:
-		// https:// developer-archive.leapmotion.com/documentation/javascript/api/Leap.Hand.html#Hand.fingers[], much easier for loop to work with.
-
-		// From distal to metacarpal,
-		for (var phalangeNum = 4; phalangeNum >= 0; phalangeNum--) {
-
-			// From thumb to pinky
-			for (var fingerNum = 0; fingerNum <= 4; fingerNum++) {
-				HandleBone(fingers[fingerNum].bones[phalangeNum], handCount, fingerNum, interactionBox);
-			}
-		}
-
-	} catch(err) {
-		// console.log("Fingers failed");
-	}
-
-}
-function HandleBone(bone, handCount, fingerIndex, interactionBox) {
-
-	try {
-
-		// Normalize point w/ interaction box
-		var normalizedPrevJoint = interactionBox.normalizePoint(bone.prevJoint, true);
-		// console.log("Prev:",normalizedPrevJoint.toString());
-
-		var normalizedNextJoint = interactionBox.normalizePoint(bone.nextJoint, true);
-		// console.log("Next:",normalizedNextJoint.toString());
-
-		// Save coordinates to vars
-		var x1 = normalizedPrevJoint[0];
-		var y1 = normalizedPrevJoint[1];
-		var z1 = normalizedPrevJoint[2];
-		var x2 = normalizedNextJoint[0];
-		var y2 = normalizedNextJoint[1];
-		var z2 = normalizedNextJoint[2];
-
-		// Record to arrays
-		row = fingerIndex;
-		col = bone.type;
-		framesOfData.set(row, col, 0, x1);
-		framesOfData.set(row, col, 1, y1);
-		framesOfData.set(row, col, 2, z1);
-		framesOfData.set(row, col, 3, x2);
-		framesOfData.set(row, col, 4, y2);
-		framesOfData.set(row, col, 5, z2);
-
-		// **MAKE SURE TRANSFORM HAPPENS AFTER DATA IS RECORDED**
-		// Scale new points to canvas
-		var canvasX1 = window.innerWidth * x1;
-		var canvasY1 = window.innerHeight * (1 - y1);
-		var canvasX2 = window.innerWidth * x2;
-		var canvasY2 = window.innerHeight * (1 - y2);
-
-		// Z min and max
-		var rawZmax = 200;
-		var rawZmin = -200
-
-		// Stroke thickness
-		var strokeWeightMax = 50;
-		var zStrokeWeight = ((bone.prevJoint[2] - rawZmin) * strokeWeightMax) / (rawZmax - rawZmin);
-
-		// Bone segment number
-		var boneType = bone.type;
-
-		/*var red = (1 - predictionAccuracyAverage) * 255;
-		var blue = predictionAccuracyAverage * 255;
-		// console.log("RED: ", red, " GREEN: ", green);
-
-		// Hands always grey, regardless of count
-		if (boneType === 0) {
-			stroke(red,  blue, 100);
-		} else if (boneType === 1) {
-			stroke(red,  blue, 75);
-		} else if (boneType === 2) {
-			stroke(red, blue,  50);
-		} else if (boneType === 3) {
-			stroke(red, blue,  25);
-		}*/
-
-		/*// GREEN IF 1 HAND
-		if (handCount === 1) {
-
-			if (boneType === 0) {
-				stroke('rgb(179, 255, 224)');
-			} else if (boneType === 1) {
-				stroke('rgb(77, 255, 184)');
-			} else if (boneType === 2) {
-				stroke('rgb(0, 230, 138)');
-			} else if (boneType === 3) {
-				stroke('rgb(0, 153, 92)');
-			}
-
-			// RED IF 2 HANDS
-		} else if (handCount === 2) {
-
-			if (boneType === 0) {
-				stroke('rgb(255, 214, 204)');
-			} else if (boneType === 1) {
-				stroke('rgb(255, 133, 102)');
-			} else if (boneType === 2) {
-				stroke('rgb(255, 71, 26)');
-			} else if (boneType === 3) {
-				stroke('rgb(179, 36, 0)');
-			}
-
-		}*/
-
-		//Set hand colors
-		if (boneType === 0) {
-			stroke('rgb(179, 255, 224)');
-		} else if (boneType === 1) {
-			stroke('rgb(77, 255, 184)');
-		} else if (boneType === 2) {
-			stroke('rgb(0, 230, 138)');
-		} else if (boneType === 3) {
-			stroke('rgb(0, 153, 92)');
-		}
-
-		strokeWeight(zStrokeWeight/5);
-
-		line(canvasX1,canvasY1,canvasX2,canvasY2);
-
-		HandleElement(bone, handCount, fingerIndex, boneType, canvasX1, canvasY1);
-	}
-	catch(err) {
-		// console.log("Drawing line failed");
-	}
 }
 
 // Determine State
@@ -1221,7 +1246,15 @@ Leap.loop(controllerOptions, function(frame) {
 		//Always display score list
 		DisplayList()
 
-		HandleEnemy();
+		//If won => win state page
+		if (youWin) {
+			ShowWinState();
+		}
+
+		//Have not won yet; Print enemies
+		else {
+			HandleEnemy();
+		}
 		HandleFrame(frame);
 
 		DetermineState(frame);

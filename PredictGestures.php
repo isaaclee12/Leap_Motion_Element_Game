@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/gh/nicolaspanel/numjs@0.15.1/dist/numjs.min.js"></script>
     <!--ml5-->
     <script src="https://unpkg.com/ml5@0.4.3/dist/ml5.min.js"></script>
-    <!--Leap-->
+    <!--Leap Motion-->
     <script type="text/javascript" src="http://js.leapmotion.com/leap-0.6.3.min.js"></script>
     <!--npm-->
     <script src="https://cdn.jsdelivr.net/npm/p5@1.1.9/lib/p5.js"></script>
@@ -261,11 +261,11 @@
     </form>
 </main>
 
-<ul id="users" style = "color:black">
+<ul id="users" style = "color:white">
     <!--<li>user1</li>-->
 </ul>
 
-<ul id="score" style="color:black"></ul>
+<ul id="score" style="color:white"></ul>
 
 </body>
 </html>
