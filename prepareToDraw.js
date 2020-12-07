@@ -14,6 +14,10 @@ function setup() {
     earthEnemyDead = loadImage('https://i.imgur.com/Md2hZLV.png');
     fireEnemyDead = loadImage('https://i.imgur.com/jvgKCbs.png');
 
+    //Tutorial Image, Weakness Square
+    tutorialImage = loadImage('https://i.imgur.com/rF5n6kz.png');
+    elementSquare = loadImage('https://i.imgur.com/Lum7dz9.png');
+
     /* Old Images.
     img = loadImage('https://i.imgur.com/2DUZesl.png');
     arrowLeft = loadImage('https://i.imgur.com/CcOkvDT.png');

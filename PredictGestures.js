@@ -757,7 +757,7 @@ function HandleDifficulty() {
 function HandleEnemy() {
 
 	if (!enemyAlive) {
-		console.log("Enemy Dead");
+		// console.log("Enemy Dead");
 
 		if (firstRun) {
 			//Spawn 1st enemy
@@ -767,12 +767,12 @@ function HandleEnemy() {
 			//Init enemy, break loop
 			enemyAlive = true;
 			showEnemy();
-			console.log("First Enemy: ", enemyElement);
+			// console.log("First Enemy: ", enemyElement);
 		}
 
 		//Show dead enemy if any run after first
 		else if (showingDeadEnemy && !firstRun) {
-			console.log("Showing dead enemy");
+			// console.log("Showing dead enemy");
 
 			//Show Image of Dead Enemy before respawn
 			showDeadEnemy();
@@ -787,7 +787,7 @@ function HandleEnemy() {
 			//Change difficulty if need be
 			HandleDifficulty();
 
-			console.log("Spawning new enemy");
+			// console.log("Spawning new enemy");
 			//Record Score
 			recordScore();
 
@@ -826,6 +826,7 @@ function HandleEnemy() {
 	//Diff 0
 	if (showingEnemyWeakness) {
 		text("Enemy Weakness: " + enemyWeakness, enemyElementTextX * (7/9), enemyElementTextY);
+		image(elementSquare, .65 * window.innerWidth, .4 * window.innerHeight, .7 * window.innerWidth, .5 * window.innerHeight);
 	}
 
 	//Diff 0 thru 1
@@ -957,14 +958,14 @@ function showDeadEnemy() {
 		timeChangeInMilliseconds = currentTime - timeSinceLastEnemyDeath;
 		enemyDeathTimer = timeChangeInMilliseconds/1000;*/
 
-		console.log("Showing Dead Enemy Image");
+		// console.log("Showing Dead Enemy Image");
 
 		//Show image of the dead enemy
 		showDeadEnemyImage();
 	}
 
 	else {
-		console.log("No Longer Showing Dead Enemy Image");
+		// console.log("No Longer Showing Dead Enemy Image");
 		//After one second, reset the vars.
 		//timeSinceLastEnemyDeath = new Date();
 		gotTimeSinceLastEnemyDeath = false;
@@ -1081,9 +1082,19 @@ function DetermineState(frame) {
 	}
 
 }
+
+var tutorialWidth = window.innerWidth/5;
+var tutorialHeight = window.innerHeight/6;
+function drawTutorial() {
+	image(tutorialImage, tutorialWidth, tutorialHeight, 2.5 * tutorialWidth, 4 * tutorialHeight);
+}
+
 // No Hands
 function HandleState0(frame) {
-	TrainKNNIfNotDoneYet();
+	drawTutorial();
+
+	// text("EGG", window.innerWidth * .75, window.innerHeight/2);
+	console.log("STATE 0");
 }
 // 1 Hand
 function HandleState1(frame) {
@@ -1238,13 +1249,15 @@ Leap.loop(controllerOptions, function(frame) {
 	try {
 		clear();
 
+		TrainKNNIfNotDoneYet();
+
 		//Set Vars for text
 		strokeWeight(1);
 		fill('rgb(0, 0, 0)');
 		stroke('rgb(0, 0, 0)');
 
 		//Always display score list
-		DisplayList()
+		DisplayList();
 
 		//If won => win state page
 		if (youWin) {
@@ -1255,9 +1268,13 @@ Leap.loop(controllerOptions, function(frame) {
 		else {
 			HandleEnemy();
 		}
-		HandleFrame(frame);
 
 		DetermineState(frame);
+
+		// console.log(programState);
+		//tutorialWidth, tutorialHeight, 3 * tutorialWidth, 3 * tutorialHeight
+
+		// image(fireEnemyDead, tutorialWidth, tutorialHeight, 3 * tutorialWidth, 3 * tutorialHeight);
 
 		if (programState === 0) {
 			HandleState0(frame);
