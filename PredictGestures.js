@@ -523,20 +523,6 @@ function ScaleElement() {
 	}*/
 }
 
-function generateNewEnemy() {
-	//Generate new enemy w/ new element:
-	//Random num 0 to 3
-	enemyID = Math.floor(Math.random() * 4);
-
-	//Validation: Make sure element is different this time
-	while(enemyID === lastEnemyID) {
-		enemyID = Math.floor(Math.random() * 4);
-	}
-
-	// Keep track of last enemy id
-	lastEnemyID = enemyID;
-}
-
 var userElementTextX = window.innerWidth/10;
 var userElementTextY = window.innerHeight/10;
 
@@ -551,12 +537,64 @@ var enemyWeakness = "";
 var enemyElementTextX = window.innerWidth * .90;
 var enemyElementTextY = window.innerHeight/10;
 
-//Win counter
-var wins = 0;
-
 //Flags for handling enemy dead/alive/printing/generating states
 var firstRun = true;
 var showingDeadEnemy = true;
+
+//Flags for handling difficulty
+var difficulty = 0;
+var winCounter = 0;
+var showingEnemyWeakness = true;
+var showingEnemyElement = true;
+var enemyDeathIsSlow = true;
+function HandleDifficulty() {
+	//After 10 wins...
+	if (winCounter >= 10) {
+		//Increase difficulty by one
+		difficulty++;
+	}
+
+	//New Conditions based on difficulty level:
+	switch (difficulty) {
+		//0: Show all, Slow Enemy Regen
+		case 0:
+			showingEnemyWeakness = true;
+			showingEnemyElement = true;
+			enemyDeathIsSlow = true;
+			break;
+
+		//1: Don't show enemy weakness
+		case 1:
+			showingEnemyWeakness = false;
+			break;
+
+		//2: Don't show enemy weakness or element
+		case 2:
+			showingEnemyWeakness = false;
+			showingEnemyElement = false;
+			break;
+
+		//3: Enemy Re-spawns Quickly
+		case 3:
+			showingEnemyWeakness = false;
+			showingEnemyElement = false;
+			enemyDeathIsSlow = false;
+			break;
+
+		//4: Reset
+		case 4:
+			console.log("You win! Resetting game.")
+			difficulty = 0;
+			showingEnemyWeakness = true;
+			showingEnemyElement = true;
+			enemyDeathIsSlow = true;
+			break;
+
+		//Error:
+		default:
+			console.log("Error: Difficulty not in range [0,3]")
+	}
+}
 
 function HandleEnemy() {
 
@@ -584,6 +622,13 @@ function HandleEnemy() {
 
 		//Done showing dead enemy, after first run
 		else if (!showingDeadEnemy) { //if (!showingDeadEnemy && !firstRun)
+
+			//Iterate win counter
+			winCounter++;
+
+			//Change difficulty if need be
+			HandleDifficulty();
+
 			console.log("Spawning new enemy");
 			//Record Score
 			recordScore();
@@ -617,14 +662,36 @@ function HandleEnemy() {
 	}
 
 	//Print enemy element and weakness
-	text("Enemy Element: " + enemyElement, enemyElementTextX * (7/9), enemyElementTextY);
-	text("Enemy Weakness: " + enemyWeakness, enemyElementTextX * (7/9), 2 * enemyElementTextY);
+
+	//Diff 0
+	if (showingEnemyWeakness) {
+		text("Enemy Weakness: " + enemyWeakness, enemyElementTextX * (7/9), 2 * enemyElementTextY);
+	}
+
+	//Diff 0 thru 1
+	if (showingEnemyElement) {
+		text("Enemy Element: " + enemyElement, enemyElementTextX * (7/9), enemyElementTextY);
+	}
 
 	//Print stats
-	var winCounter = "Wins: " + wins;
-	text(winCounter, enemyElementTextX * (7/9), enemyElementTextY * 3);
-
+	// var winCounter = "Wins: " + wins;
+	// text(winCounter, enemyElementTextX * (7/9), enemyElementTextY * 3);
 }
+
+function generateNewEnemy() {
+	//Generate new enemy w/ new element:
+	//Random num 0 to 3
+	enemyID = Math.floor(Math.random() * 4);
+
+	//Validation: Make sure element is different this time
+	while(enemyID === lastEnemyID) {
+		enemyID = Math.floor(Math.random() * 4);
+	}
+
+	// Keep track of last enemy id
+	lastEnemyID = enemyID;
+}
+
 var enemyWidth = window.innerWidth/4;
 var enemyHeight = window.innerHeight/6;
 function showEnemy() {
